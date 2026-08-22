@@ -14,7 +14,7 @@
     if(label)label.textContent='Email';
     if(username){username.type='email';username.autocomplete='email';username.placeholder='admin@example.com';}
     dhAuth.onAuthStateChanged(function(user){
-      document.body.classList.add('auth-ready');
+      document.body.classList.remove('auth-loading');
       if(user){login.classList.add('hidden');app.classList.remove('hidden');if(typeof show==='function')show('dashboard');}
       else{app.classList.add('hidden');login.classList.remove('hidden');document.querySelector('#password').value='';}
     });
