@@ -14,27 +14,24 @@
   const paymentRef=id=>paymentCol().doc(String(id));
   let students=[],payments=[],currentStudentId=null;
   function setState(){window.dhStudents=students;window.dhPayments=payments;}
-  function firestoreError(e){
-    console.error('Firestore error:',e);
-    if(e?.code==='permission-denied') return 'Firestore permission denied. Firebase Console → Firestore → Rules-এ repository-এর firestore.rules Publish করুন।';
-    if(e?.code==='failed-precondition') return 'Firestore Database/Index configuration incomplete. Firebase Console-এ Firestore Database check করুন।';
-    if(e?.code==='unavailable') return 'Firestore temporarily unavailable. Internet connection check করে আবার চেষ্টা করুন।';
-    return `Firestore connection failed: ${e?.code||'unknown-error'}`;
-  }
+  function firestoreError(e){console.error('Firestore error:',e);if(e?.code==='permission-denied')return 'Firestore permission denied. Rules check করুন।';if(e?.code==='failed-precondition')return 'Firestore configuration incomplete. Firebase Console check করুন।';if(e?.code==='unavailable')return 'Firestore temporarily unavailable. Internet connection check করুন।';return `Firestore connection failed: ${e?.code||'unknown-error'}`;}
   async function migrateLegacy(){
-    const marker=`dh_firestore_migrated_${currentUser.uid}`;
-    if(localStorage.getItem(marker))return;
+    // Never rely only on the migration marker: an earlier empty/failed run may have set it.
+    const oldKey='dingel_hafizia_students_v1',oldPayKey='dingel_hafizia_payments_v1';
     let oldStudents=[],oldPayments=[];
-    try{oldStudents=JSON.parse(localStorage.getItem('dingel_hafizia_students_v1')||'[]');oldPayments=JSON.parse(localStorage.getItem('dingel_hafizia_payments_v1')||'[]')}catch(e){console.error(e)}
-    if(!oldStudents.length&&!oldPayments.length){localStorage.setItem(marker,'1');return;}
-    const existing=await studentCol().limit(1).get();
-    if(!existing.empty){localStorage.setItem(marker,'1');return;}
-    if(oldStudents.length+oldPayments.length>450)throw new Error('migration-too-many-records');
+    try{oldStudents=JSON.parse(localStorage.getItem(oldKey)||'[]');oldPayments=JSON.parse(localStorage.getItem(oldPayKey)||'[]')}catch(e){console.error('Legacy data parse error',e);return;}
+    if(!oldStudents.length&&!oldPayments.length)return;
+    const existing=await studentCol().get();
+    if(!existing.empty)return;
+    if(oldStudents.length+oldPayments.length>450){alert('পুরনো data অনেক বেশি। নিরাপদে ছোট batch-এ migration করতে হবে।');return;}
     const batch=db.batch(),map={};
-    oldStudents.forEach(s=>{const ref=studentCol().doc();map[String(s.id)]=ref.id;batch.set(ref,{roll:String(s.roll||''),name:String(s.name||''),father:String(s.father||''),address:String(s.address||''),studentAadhaar:String(s.studentAadhaar||''),fatherAadhaar:String(s.fatherAadhaar||''),phone:String(s.phone||''),admissionFees:Number(s.admissionFees||0),monthlyFees:Number(s.monthlyFees||0),admissionDate:s.admissionDate||'',category:s.category||'Paid',className:s.className||'Maktab',status:s.status||'Active',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()})});
-    oldPayments.forEach(p=>{const sid=map[String(p.studentId)];if(!sid)return;batch.set(paymentCol().doc(),{studentId:sid,month:p.month||currentMonth(),amount:Number(p.amount||0),date:p.date||'',note:p.note||'',receiptNo:p.receiptNo||'',createdAt:firebase.firestore.FieldValue.serverTimestamp()})});
+    oldStudents.forEach(s=>{
+      const ref=studentCol().doc();map[String(s.id)]=ref.id;
+      batch.set(ref,{roll:String(s.roll||''),name:String(s.name||''),father:String(s.father||s.fatherName||''),address:String(s.address||''),studentAadhaar:String(s.studentAadhaar||''),fatherAadhaar:String(s.fatherAadhaar||''),phone:String(s.phone||''),admissionFees:Number(s.admissionFees||0),monthlyFees:Number(s.monthlyFees||0),admissionDate:s.admissionDate||'',category:s.category||'Paid',className:s.className||s.class||'Maktab',status:s.status||'Active',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    });
+    oldPayments.forEach(p=>{const sid=map[String(p.studentId)];if(!sid)return;batch.set(paymentCol().doc(),{studentId:sid,month:p.month||currentMonth(),amount:Number(p.amount||0),date:p.date||p.paymentDate||'',note:p.note||'',receiptNo:p.receiptNo||'',createdAt:firebase.firestore.FieldValue.serverTimestamp()});});
     await batch.commit();
-    localStorage.setItem(marker,'1');
+    localStorage.setItem(`dh_firestore_migrated_${currentUser.uid}`,'1');
   }
   async function load(){
     const [ss,ps]=await Promise.all([studentCol().get(),paymentCol().get()]);
@@ -53,8 +50,7 @@
   window.history=function(id){const s=students.find(x=>x.id===id);if(!s)return;const list=payments.filter(p=>p.studentId===id).sort((a,b)=>String(b.date).localeCompare(String(a.date)));$('#history').innerHTML=`<h2>Payment History — ${esc(s.name)}</h2><table><thead><tr><th>Month</th><th>Amount</th><th>Date</th><th>Note</th><th></th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.month)}</td><td>${money(p.amount)}</td><td>${esc(p.date)}</td><td>${esc(p.note)}</td><td><button class="danger" onclick="deletePayment('${p.id}','${id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No payment history</td></tr>'}</tbody></table>`;$('#historyModal').showModal()};
   window.renderFees=function(){const m=$('#feeMonth')?.value||currentMonth(),q=($('#feeSearch')?.value||'').toLowerCase(),rows=students.filter(s=>!q||[s.roll,s.name,s.father].join(' ').toLowerCase().includes(q));let tm=0,tp=0,td=0;$('#feeRows').innerHTML=rows.map(s=>{const monthly=feeForMonth(s),paid=paidForMonth(s.id,m),due=Math.max(monthly-paid,0);tm+=monthly;tp+=paid;td+=due;return `<tr><td>${esc(s.roll)}</td><td>${esc(s.name)}</td><td>${money(monthly)}</td><td>${money(paid)}</td><td>${money(due)}</td><td><button onclick="addPaymentFor('${s.id}','${m}')">Add Payment</button> <button onclick="history('${s.id}')">History</button></td></tr>`}).join('')||'<tr><td colspan="6" class="empty">No students found</td></tr>';$('#feeTotalStudents').textContent=rows.length;$('#feeTotalMonthly').textContent=money(tm);$('#feeTotalPaid').textContent=money(tp);$('#feeTotalDue').textContent=money(td)};
   window.addPaymentFor=function(id,m){window.addPayment();setTimeout(()=>{$('#paymentStudent').value=id;$('#paymentMonth').value=m},0)};
-  const oldAddPayment=window.addPayment;
   window.addPayment=function(){const a=students.filter(s=>s.status==='Active');if(!a.length)return alert('প্রথমে Active student add করুন।');$('#paymentStudent').innerHTML=a.map(s=>`<option value="${esc(s.id)}">${esc(s.roll)} - ${esc(s.name)}</option>`).join('');$('#paymentForm').reset();$('#paymentStudent').value=a[0].id;$('#paymentMonth').value=$('#feeMonth')?.value||currentMonth();$('#paymentForm [name="paymentDate"]').value=new Date().toISOString().slice(0,10);$('#paymentModal').showModal()};
   if(originalShow){window.show=function(page){originalShow(page);if(page==='students')renderStudents();if(page==='fees')renderFees()}}
-  document.addEventListener('DOMContentLoaded',function(){dhAuth.onAuthStateChanged(async user=>{currentUser=user;if(!user)return;try{db=firebase.firestore();await migrateLegacy();await load()}catch(e){alert(firestoreError(e))}})});
+  document.addEventListener('DOMContentLoaded',function(){dhAuth.onAuthStateChanged(async user=>{currentUser=user;if(!user)return;try{db=firebase.firestore();await migrateLegacy();await load()}catch(e){alert(firestoreError(e));}})});
 })();
