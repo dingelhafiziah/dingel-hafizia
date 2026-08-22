@@ -15,7 +15,6 @@ def hash_password(password):
 def initialize_database():
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,7 +22,6 @@ def initialize_database():
             password TEXT NOT NULL
         )
     """)
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,14 +40,20 @@ def initialize_database():
             status TEXT DEFAULT 'Active'
         )
     """)
-
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS fee_payments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id INTEGER NOT NULL,
+            payment_month TEXT NOT NULL,
+            amount REAL NOT NULL DEFAULT 0,
+            payment_date TEXT NOT NULL,
+            note TEXT,
+            FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE
+        )
+    """)
     cursor.execute("SELECT id FROM users WHERE username = ?", ("admin",))
     if cursor.fetchone() is None:
-        cursor.execute(
-            "INSERT INTO users (username, password) VALUES (?, ?)",
-            ("admin", hash_password("admin123"))
-        )
-
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", ("admin", hash_password("admin123")))
     conn.commit()
     conn.close()
 
@@ -57,10 +61,7 @@ def initialize_database():
 def authenticate(username, password):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT id FROM users WHERE username = ? AND password = ?",
-        (username, hash_password(password))
-    )
+    cursor.execute("SELECT id FROM users WHERE username = ? AND password = ?", (username, hash_password(password)))
     user = cursor.fetchone()
     conn.close()
     return user is not None
