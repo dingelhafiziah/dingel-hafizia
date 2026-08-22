@@ -1,6 +1,6 @@
 import tkinter as tk
-from tkinter import messagebox
-from database import initialize_database, authenticate
+from tkinter import messagebox, ttk
+from database import initialize_database, authenticate, get_connection
 
 
 class DingelHafiziaApp:
@@ -19,22 +19,17 @@ class DingelHafiziaApp:
     def show_login(self):
         self.clear_window()
         self.root.configure(bg="#f4f6f8")
-
         container = tk.Frame(self.root, bg="white", width=400, height=430)
         container.place(relx=0.5, rely=0.5, anchor="center")
         container.pack_propagate(False)
-
         tk.Label(container, text="Dingel Hafizia Madrasa", font=("Arial", 22, "bold"), bg="white", fg="#17324d").pack(pady=(45, 8))
         tk.Label(container, text="Admin Login", font=("Arial", 13), bg="white", fg="#666666").pack(pady=(0, 30))
-
         tk.Label(container, text="Username", font=("Arial", 11, "bold"), bg="white").pack(anchor="w", padx=45)
         self.username_entry = tk.Entry(container, font=("Arial", 12), relief="solid", bd=1)
         self.username_entry.pack(fill="x", padx=45, ipady=8, pady=(5, 18))
-
         tk.Label(container, text="Password", font=("Arial", 11, "bold"), bg="white").pack(anchor="w", padx=45)
         self.password_entry = tk.Entry(container, font=("Arial", 12), show="*", relief="solid", bd=1)
         self.password_entry.pack(fill="x", padx=45, ipady=8, pady=(5, 25))
-
         tk.Button(container, text="LOGIN", font=("Arial", 11, "bold"), bg="#17324d", fg="white", activebackground="#234b70", activeforeground="white", relief="flat", cursor="hand2", command=self.login).pack(fill="x", padx=45, ipady=10)
         self.password_entry.bind("<Return>", lambda event: self.login())
         self.username_entry.focus()
@@ -53,11 +48,9 @@ class DingelHafiziaApp:
     def show_main_app(self):
         self.clear_window()
         self.root.configure(bg="#f4f6f8")
-
         self.sidebar = tk.Frame(self.root, bg="#17324d", width=240)
         self.sidebar.pack(side="left", fill="y")
         self.sidebar.pack_propagate(False)
-
         tk.Label(self.sidebar, text="DINGEL HAFIZIA\nMADRASAH", font=("Arial", 16, "bold"), bg="#17324d", fg="white", justify="center").pack(pady=(30, 40))
         self.create_menu_button("Dashboard", self.show_dashboard)
         self.create_menu_button("Students", self.show_students)
@@ -65,7 +58,6 @@ class DingelHafiziaApp:
         self.create_menu_button("Settings", self.show_settings)
         tk.Frame(self.sidebar, bg="#17324d").pack(expand=True, fill="both")
         self.create_menu_button("Logout", self.logout)
-
         self.content = tk.Frame(self.root, bg="#f4f6f8")
         self.content.pack(side="left", fill="both", expand=True)
         self.show_dashboard()
@@ -82,7 +74,105 @@ class DingelHafiziaApp:
 
     def show_students(self):
         self.clear_content()
-        tk.Label(self.content, text="Students", font=("Arial", 24, "bold"), bg="#f4f6f8", fg="#17324d").pack(anchor="w", padx=35, pady=(30, 20))
+        header = tk.Frame(self.content, bg="#f4f6f8")
+        header.pack(fill="x", padx=30, pady=(25, 15))
+        tk.Label(header, text="Students", font=("Arial", 24, "bold"), bg="#f4f6f8", fg="#17324d").pack(side="left")
+        tk.Button(header, text="+ Add Student", font=("Arial", 11, "bold"), bg="#17324d", fg="white", relief="flat", cursor="hand2", command=self.show_add_student).pack(side="right", ipadx=12, ipady=7)
+
+        search_frame = tk.Frame(self.content, bg="#f4f6f8")
+        search_frame.pack(fill="x", padx=30, pady=5)
+        tk.Label(search_frame, text="Search", bg="#f4f6f8", font=("Arial", 10, "bold")).pack(side="left")
+        self.search_entry = tk.Entry(search_frame, font=("Arial", 11), width=35)
+        self.search_entry.pack(side="left", padx=10, ipady=5)
+        tk.Button(search_frame, text="Search", command=self.load_students).pack(side="left")
+        tk.Button(search_frame, text="All", command=lambda: self.load_students("")).pack(side="left", padx=5)
+
+        columns = ("id", "roll", "name", "father", "class", "category", "monthly", "status")
+        self.student_tree = ttk.Treeview(self.content, columns=columns, show="headings")
+        headings = {"id":"ID", "roll":"Roll", "name":"Name", "father":"Father", "class":"Class", "category":"Category", "monthly":"Monthly", "status":"Status"}
+        widths = {"id":45, "roll":60, "name":150, "father":130, "class":100, "category":90, "monthly":80, "status":80}
+        for col in columns:
+            self.student_tree.heading(col, text=headings[col])
+            self.student_tree.column(col, width=widths[col], anchor="center")
+        self.student_tree.pack(fill="both", expand=True, padx=30, pady=10)
+        self.load_students()
+
+    def load_students(self, query=None):
+        if not hasattr(self, "student_tree"):
+            return
+        if query is None:
+            query = self.search_entry.get().strip()
+        else:
+            self.search_entry.delete(0, tk.END)
+            self.search_entry.insert(0, query)
+        for item in self.student_tree.get_children():
+            self.student_tree.delete(item)
+        conn = get_connection()
+        cur = conn.cursor()
+        if query:
+            like = f"%{query}%"
+            cur.execute("SELECT id, roll, student_name, father_name, class_name, category, monthly_fees, status FROM students WHERE roll LIKE ? OR student_name LIKE ? OR father_name LIKE ? ORDER BY id DESC", (like, like, like))
+        else:
+            cur.execute("SELECT id, roll, student_name, father_name, class_name, category, monthly_fees, status FROM students ORDER BY id DESC")
+        for row in cur.fetchall():
+            self.student_tree.insert("", tk.END, values=row)
+        conn.close()
+
+    def show_add_student(self):
+        self.clear_content()
+        tk.Label(self.content, text="Add Student", font=("Arial", 24, "bold"), bg="#f4f6f8", fg="#17324d").pack(anchor="w", padx=35, pady=(25, 15))
+        form = tk.Frame(self.content, bg="#f4f6f8")
+        form.pack(fill="both", expand=True, padx=35)
+        fields = [
+            ("Roll", "roll"), ("Student Name", "student_name"), ("Father Name", "father_name"),
+            ("Address", "address"), ("Student Aadhaar", "student_aadhaar"), ("Father Aadhaar", "father_aadhaar"),
+            ("Phone Number", "phone"), ("Admission Fees", "admission_fees"), ("Monthly Fees", "monthly_fees"),
+            ("Admission Date", "admission_date")
+        ]
+        self.student_vars = {}
+        for i, (label, key) in enumerate(fields):
+            r, c = divmod(i, 2)
+            tk.Label(form, text=label, bg="#f4f6f8", font=("Arial", 10, "bold")).grid(row=r*2, column=c, sticky="w", padx=8, pady=(8, 2))
+            var = tk.StringVar()
+            self.student_vars[key] = var
+            tk.Entry(form, textvariable=var, font=("Arial", 11), width=34).grid(row=r*2+1, column=c, sticky="ew", padx=8, ipady=5)
+        for c in range(2):
+            form.columnconfigure(c, weight=1)
+
+        row = 10
+        tk.Label(form, text="Category", bg="#f4f6f8", font=("Arial", 10, "bold")).grid(row=row*2, column=0, sticky="w", padx=8, pady=(10,2))
+        self.category_var = tk.StringVar(value="Paid")
+        ttk.Combobox(form, textvariable=self.category_var, values=["Atim", "Free", "Paid"], state="readonly", width=31).grid(row=row*2+1, column=0, sticky="ew", padx=8, ipady=4)
+        tk.Label(form, text="Class", bg="#f4f6f8", font=("Arial", 10, "bold")).grid(row=row*2, column=1, sticky="w", padx=8, pady=(10,2))
+        self.class_var = tk.StringVar(value="Maktab")
+        ttk.Combobox(form, textvariable=self.class_var, values=["Maktab", "Hifz", "Adna Alif", "Adna Ba"], state="readonly", width=31).grid(row=row*2+1, column=1, sticky="ew", padx=8, ipady=4)
+
+        tk.Label(form, text="Status", bg="#f4f6f8", font=("Arial", 10, "bold")).grid(row=24, column=0, sticky="w", padx=8, pady=(10,2))
+        self.status_var = tk.StringVar(value="Active")
+        ttk.Combobox(form, textvariable=self.status_var, values=["Active", "Deactive"], state="readonly", width=31).grid(row=25, column=0, sticky="ew", padx=8, ipady=4)
+        tk.Button(form, text="Save Student", font=("Arial", 11, "bold"), bg="#17324d", fg="white", relief="flat", cursor="hand2", command=self.save_student).grid(row=27, column=0, pady=20, padx=8, sticky="w", ipadx=20, ipady=8)
+        tk.Button(form, text="Cancel", command=self.show_students).grid(row=27, column=1, pady=20, padx=8, sticky="w", ipadx=20, ipady=8)
+
+    def save_student(self):
+        data = {k: v.get().strip() for k, v in self.student_vars.items()}
+        if not data["roll"] or not data["student_name"] or not data["father_name"]:
+            messagebox.showwarning("Required", "Roll, Student Name এবং Father Name অবশ্যই দিতে হবে।")
+            return
+        try:
+            admission = float(data["admission_fees"] or 0)
+            monthly = float(data["monthly_fees"] or 0)
+        except ValueError:
+            messagebox.showerror("Invalid", "Admission Fees এবং Monthly Fees সংখ্যায় দিন।")
+            return
+        if self.category_var.get() in ("Atim", "Free"):
+            monthly = 0
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO students (roll, student_name, father_name, address, student_aadhaar, father_aadhaar, phone, admission_fees, monthly_fees, admission_date, category, class_name, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (data["roll"], data["student_name"], data["father_name"], data["address"], data["student_aadhaar"], data["father_aadhaar"], data["phone"], admission, monthly, data["admission_date"], self.category_var.get(), self.class_var.get(), self.status_var.get()))
+        conn.commit()
+        conn.close()
+        messagebox.showinfo("Saved", "Student successfully added.")
+        self.show_students()
 
     def show_fees(self):
         self.clear_content()
