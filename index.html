@@ -1,34 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dingel Hafizia App</title>
-  <style>
-    *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17324d;min-height:100vh;display:flex;align-items:center;justify-content:center}.card{width:min(92%,620px);background:#fff;border-radius:18px;padding:34px 28px;box-shadow:0 10px 35px rgba(0,0,0,.08)}h1{margin:0 0 8px;font-size:30px;text-align:center}.sub{text-align:center;color:#66717d;margin-bottom:24px}.status{padding:12px 15px;border-radius:10px;background:#eaf5ed;color:#245b35;font-weight:700;margin-bottom:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{background:#f4f6f8;padding:12px;border-radius:9px;font-size:14px}.item b{display:block;margin-bottom:4px}.footer{text-align:center;margin-top:24px;color:#89929b;font-size:12px;line-height:1.6}@media(max-width:520px){.grid{grid-template-columns:1fr}h1{font-size:25px}}
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#17324d"><title>Dingel Hafizia App</title><link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="card">
-    <h1>Dingel Hafizia Madrasa</h1>
-    <div class="sub">Dingel Hafizia App — Project Home</div>
-    <div class="status">✓ GitHub Pages is working — 404 fixed</div>
-    <section class="grid">
-      <div class="item"><b>01. Login</b>Admin login system</div>
-      <div class="item"><b>02. Dashboard</b>Dashboard kept empty</div>
-      <div class="item"><b>03. Sidebar</b>Dashboard, Students, Fees, Settings</div>
-      <div class="item"><b>04. Students</b>Student management module</div>
-      <div class="item"><b>05. Student Form</b>Add, edit and delete</div>
-      <div class="item"><b>06. Student Details</b>Full student information</div>
-      <div class="item"><b>07. Status</b>Active / Deactive</div>
-      <div class="item"><b>08. Category</b>Atim / Free / Paid</div>
-      <div class="item"><b>09. Class</b>Maktab / Hifz / Adna Alif / Adna Ba</div>
-      <div class="item"><b>10. Fees</b>Monthly fee, paid and due</div>
-      <div class="item"><b>11. Add Payment</b>Fee payment entry</div>
-      <div class="item"><b>12. Payment History</b>View and delete payments</div>
-      <div class="item"><b>13. GitHub Pages</b>Project landing page configured</div>
-    </section>
-    <div class="footer">The management application itself is a Python/Tkinter desktop application. GitHub Pages hosts this project information page.</div>
-  </main>
-</body>
-</html>
+<section id="login" class="login-screen"><form id="loginForm" class="login-card"><h1>Dingel Hafizia</h1><p>Madrasah Management App</p><div class="field"><label>Username</label><input id="username" autocomplete="username" required></div><div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" required></div><button type="submit">LOGIN</button><small style="display:block;text-align:center;margin-top:14px;color:#777">Default: admin / admin123</small></form></section>
+<section id="app" class="layout hidden"><aside class="sidebar"><div class="brand">DINGEL HAFIZIA<br>MADRASAH</div><button class="nav-btn active" data-page="dashboard">Dashboard</button><button class="nav-btn" data-page="students">Students</button><button class="nav-btn" data-page="fees">Fees</button><button class="nav-btn" data-page="settings">Settings</button><button class="nav-btn logout" onclick="logout()">Logout</button></aside><main class="main">
+<section id="page-dashboard" class="page"><div class="page-head"><h1>Dashboard</h1></div><div class="dashboard-empty"></div></section>
+<section id="page-students" class="page hidden"><div class="page-head"><h1>Students <small id="studentCount"></small></h1><button onclick="addStudent()">+ Add Student</button></div><div class="toolbar"><input id="studentSearch" placeholder="Search roll, name, father, phone"><select id="studentFilter"><option>All</option><option>Active</option><option>Deactive</option></select></div><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Name</th><th>Father</th><th>Class</th><th>Category</th><th>Monthly</th><th>Status</th><th>Action</th></tr></thead><tbody id="studentRows"></tbody></table></div></section>
+<section id="page-fees" class="page hidden"><div class="page-head"><h1>Fees</h1><button onclick="addPayment()">+ Add Payment</button></div><div class="toolbar"><input id="feeSearch" placeholder="Search student"></div><div class="table-wrap"><table><thead><tr><th>Roll</th><th>Student</th><th>Monthly</th><th>Paid</th><th>Due</th><th>Action</th></tr></thead><tbody id="feeRows"></tbody></table></div></section>
+<section id="page-settings" class="page hidden"><div class="page-head"><h1>Settings</h1></div></section>
+</main></section>
+<dialog id="studentModal" class="modal"><div class="modal-body"><h2 id="studentModalTitle">Add Student</h2><form id="studentForm"><div class="form-grid"><div class="field"><label>Roll *</label><input name="studentRoll" id="studentRoll" required></div><div class="field"><label>Student Name *</label><input name="studentName" id="studentName" required></div><div class="field"><label>Father Name *</label><input name="fatherName" id="fatherName" required></div><div class="field"><label>Phone Number</label><input name="phone" id="phone" inputmode="tel"></div><div class="field full"><label>Address</label><input name="address" id="address"></div><div class="field"><label>Student Aadhaar</label><input name="studentAadhaar" id="studentAadhaar"></div><div class="field"><label>Father Aadhaar</label><input name="fatherAadhaar" id="fatherAadhaar"></div><div class="field"><label>Admission Fees</label><input name="admissionFees" id="admissionFees" type="number" min="0"></div><div class="field"><label>Monthly Fees</label><input name="monthlyFees" id="monthlyFees" type="number" min="0"></div><div class="field"><label>Admission Date</label><input name="admissionDate" id="admissionDate" type="date"></div><div class="field"><label>Category</label><select name="studentCategory" id="studentCategory"><option>Atim</option><option>Free</option><option>Paid</option></select></div><div class="field"><label>Class</label><select name="studentClass" id="studentClass"><option>Maktab</option><option>Hifz</option><option>Adna Alif</option><option>Adna Ba</option></select></div><div class="field"><label>Status</label><select name="studentStatus" id="studentStatus"><option>Active</option><option>Deactive</option></select></div></div><div class="modal-actions"><button type="button" onclick="$('#studentModal').close()">Cancel</button><button type="submit">Save Student</button></div></form></div></dialog>
+<dialog id="detailsModal" class="modal"><div class="modal-body" id="details"></div><div class="modal-actions"><button onclick="$('#detailsModal').close()">Close</button></div></dialog>
+<dialog id="paymentModal" class="modal"><div class="modal-body"><h2>Add Fee Payment</h2><form id="paymentForm"><div class="field"><label>Student</label><select id="paymentStudent" name="paymentStudent"></select></div><div class="form-grid"><div class="field"><label>Payment Month *</label><input name="paymentMonth" placeholder="August 2026" required></div><div class="field"><label>Paid Amount *</label><input name="amount" type="number" min="0" step="0.01" required></div><div class="field"><label>Payment Date *</label><input name="paymentDate" type="date" required></div><div class="field"><label>Note</label><input name="note"></div></div><div class="modal-actions"><button type="button" onclick="$('#paymentModal').close()">Cancel</button><button type="submit">Save Payment</button></div></form></div></dialog>
+<dialog id="historyModal" class="modal"><div class="modal-body" id="history"></div><div class="modal-actions"><button onclick="$('#historyModal').close()">Close</button></div></dialog>
+<script src="app.js"></script>
+</body></html>
