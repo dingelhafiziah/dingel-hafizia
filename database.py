@@ -5,7 +5,9 @@ DB_NAME = "app.db"
 
 
 def get_connection():
-    return sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME)
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
 
 def hash_password(password):
@@ -51,9 +53,18 @@ def initialize_database():
             FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE
         )
     """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_students_roll ON students(roll)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_students_name ON students(student_name)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_students_status ON students(status)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_fee_student ON fee_payments(student_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_fee_month ON fee_payments(payment_month)")
+
     cursor.execute("SELECT id FROM users WHERE username = ?", ("admin",))
     if cursor.fetchone() is None:
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", ("admin", hash_password("admin123")))
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (?, ?)",
+            ("admin", hash_password("admin123"))
+        )
     conn.commit()
     conn.close()
 
@@ -61,7 +72,45 @@ def initialize_database():
 def authenticate(username, password):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id FROM users WHERE username = ? AND password = ?", (username, hash_password(password)))
+    cursor.execute(
+        "SELECT id FROM users WHERE username = ? AND password = ?",
+        (username, hash_password(password))
+    )
     user = cursor.fetchone()
     conn.close()
     return user is not None
+
+
+def add_payment(student_id, payment_month, amount, payment_date, note=""):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO fee_payments (student_id, payment_month, amount, payment_date, note) VALUES (?, ?, ?, ?, ?)",
+        (student_id, payment_month, amount, payment_date, note)
+    )
+    payment_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return payment_id
+
+
+def get_payment_history(student_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, payment_month, amount, payment_date, note FROM fee_payments WHERE student_id = ? ORDER BY payment_date DESC, id DESC",
+        (student_id,)
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+
+def delete_payment(payment_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM fee_payments WHERE id = ?", (payment_id,))
+    deleted = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return deleted
