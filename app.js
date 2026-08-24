@@ -16,6 +16,8 @@
     document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
     if(page==='students'&&window.renderStudents)window.renderStudents();
     if(page==='fees'&&window.renderFees)window.renderFees();
+    if(page==='accounts'&&window.renderAccounts)window.renderAccounts();
+    if(page==='dashboard'&&window.renderDashboard)window.renderDashboard();
     if(window.innerWidth<=900)window.toggleMenu(false);
   };
 
@@ -54,6 +56,8 @@
     $('#studentForm')?.addEventListener('submit',function(e){e.preventDefault();window.saveStudent&&window.saveStudent(new FormData(this));});
     $('#feeSearch')?.addEventListener('input',()=>window.renderFees&&window.renderFees());
     $('#feeMonth')?.addEventListener('change',()=>window.renderFees&&window.renderFees());
+    $('#accountType')?.addEventListener('change',()=>window.renderAccounts&&window.renderAccounts());
+    $('#accountSearch')?.addEventListener('input',()=>window.renderAccounts&&window.renderAccounts());
     window.addEventListener('resize',()=>{if(window.innerWidth>900)window.toggleMenu(false)});
   });
 })();
