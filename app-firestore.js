@@ -1,6 +1,6 @@
 // Dingel Hafizia App - Firestore data layer.
 (function(){
-  let db=null,currentUser=null;
+  let db=null,currentUser=null,storage=null;
   const $=s=>document.querySelector(s);
   const esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
   const money=v=>Number(v||0).toFixed(2);
@@ -140,6 +140,16 @@
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser?.uid||''
     };
     try{
+      const photo=fd.get('photo');
+      if(photo&&photo instanceof File&&photo.size>0){
+        if(photo.size>5*1024*1024) return alert('Photo must be 5 MB or smaller.');
+        if(!String(photo.type||'').startsWith('image/')) return alert('Please select an image file.');
+        const photoId=id||('new-'+Date.now());
+        const ref=storage.ref().child('studentPhotos/'+photoId+'/'+photo.name.replace(/[^a-zA-Z0-9._-]/g,'_'));
+        await ref.put(photo,{contentType:photo.type});
+        data.photoUrl=await ref.getDownloadURL();
+        data.photoPath=ref.fullPath;
+      }
       if(id){await studentRef(id).update(data);students=students.map(s=>String(s.id)===String(id)?{...s,...data}:s)}
       else{data.createdAt=firebase.firestore.FieldValue.serverTimestamp();data.createdBy=currentUser?.uid||'';const ref=await studentCol().add(data);students.push({id:ref.id,...data})}
       setState();$('#studentModal')?.close();renderStudents();renderFees();alert(id?'Student updated successfully.':'Student admitted successfully.');
@@ -220,6 +230,6 @@
   });
 
   document.addEventListener('DOMContentLoaded',function(){
-    dhAuth.onAuthStateChanged(async user=>{currentUser=user;if(!user)return;try{if(window.dhAuthReady)await window.dhAuthReady;db=firebase.firestore();await load()}catch(e){alert(firestoreError(e))}});
+    dhAuth.onAuthStateChanged(async user=>{currentUser=user;if(!user)return;try{if(window.dhAuthReady)await window.dhAuthReady;db=firebase.firestore();storage=firebase.storage();await load()}catch(e){alert(firestoreError(e))}});
   });
 })();
