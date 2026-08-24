@@ -10,6 +10,8 @@
   const paymentCol=()=>db.collection('payments');
   const studentRef=id=>studentCol().doc(String(id));
   const paymentRef=id=>paymentCol().doc(String(id));
+  const accountCol=()=>db.collection('accounts');
+  let accounts=[];
   let students=[],payments=[];
 
   function setState(){window.dhStudents=students;window.dhPayments=payments}
@@ -18,11 +20,33 @@
   function paidForMonth(id,m){return payments.filter(p=>String(p.studentId)===String(id)&&monthKey(p.month)===m).reduce((a,p)=>a+Number(p.amount||0),0)}
 
   async function load(){
-    const [ss,ps]=await Promise.all([studentCol().get(),paymentCol().get()]);
+    const [ss,ps,as]=await Promise.all([studentCol().get(),paymentCol().get(),accountCol().get()]);
     students=ss.docs.map(d=>({id:d.id,...d.data()}));
     payments=ps.docs.map(d=>({id:d.id,...d.data()}));
-    setState(); renderStudents(); renderFees();
+    accounts=as.docs.map(d=>({id:d.id,...d.data()}));
+    setState(); renderStudents(); renderFees(); renderAccounts(); renderDashboard();
   }
+
+
+  window.renderDashboard=function(){
+    const month=currentMonth(), active=students.filter(s=>(s.status||'Active')==='Active');
+    const monthly=active.reduce((a,s)=>a+feeForMonth(s),0), paid=active.reduce((a,s)=>a+paidForMonth(s.id,month),0), due=Math.max(monthly-paid,0);
+    const income=accounts.filter(a=>a.type==='Income').reduce((x,a)=>x+Number(a.amount||0),0)+payments.reduce((x,p)=>x+Number(p.amount||0),0);
+    const expense=accounts.filter(a=>a.type==='Expense').reduce((x,a)=>x+Number(a.amount||0),0);
+    const vals={dashStudents:active.length,dashMonthly:'₹'+money(monthly),dashPaid:'₹'+money(paid),dashDue:'₹'+money(due),dashIncome:'₹'+money(income),dashExpense:'₹'+money(expense),dashBalance:'₹'+money(income-expense)};
+    Object.entries(vals).forEach(([id,v])=>{const el=$('#'+id);if(el)el.textContent=v});
+  };
+
+  window.renderAccounts=function(){
+    const type=$('#accountType')?.value||'',q=($('#accountSearch')?.value||'').toLowerCase();
+    const rows=accounts.filter(a=>(!type||a.type===type)&&(!q||String(a.description||'').toLowerCase().includes(q)||String(a.note||'').toLowerCase().includes(q))).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    const income=accounts.filter(a=>a.type==='Income').reduce((x,a)=>x+Number(a.amount||0),0),expense=accounts.filter(a=>a.type==='Expense').reduce((x,a)=>x+Number(a.amount||0),0);
+    $('#accountIncome')&&($('#accountIncome').textContent=money(income)); $('#accountExpense')&&($('#accountExpense').textContent=money(expense)); $('#accountBalance')&&($('#accountBalance').textContent=money(income-expense));
+    const tbody=$('#accountRows');if(tbody)tbody.innerHTML=rows.map(a=>`<tr><td>${esc(a.date||'—')}</td><td>${esc(a.type)}</td><td>${esc(a.description)}</td><td>₹${money(a.amount)}</td><td><button class="danger" onclick="deleteAccountEntry('${esc(a.id)}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No account entries found</td></tr>';
+  };
+
+  window.addAccountEntry=function(){const m=$('#accountModal'),f=$('#accountForm');if(!m||!f)return;f.reset();f.querySelector('[name="date"]').value=new Date().toISOString().slice(0,10);m.showModal()};
+  window.deleteAccountEntry=async function(id){if(!confirm('Delete this account entry?'))return;try{await accountCol().doc(String(id)).delete();accounts=accounts.filter(a=>String(a.id)!==String(id));renderAccounts();renderDashboard()}catch(e){alert(firestoreError(e))}};
 
   window.renderStudents=function(){
     const q=($('#studentSearch')?.value||'').trim().toLowerCase();
@@ -139,6 +163,11 @@
         const ref=await paymentCol().add(data); payments.push({id:ref.id,...data}); setState(); this.reset(); $('#paymentModal')?.close(); renderFees(); renderStudents(); alert('Payment saved successfully.');
       }catch(err){alert(firestoreError(err))}
     });
+  });
+
+
+  document.addEventListener('DOMContentLoaded',function(){
+    $('#accountForm')?.addEventListener('submit',async function(e){e.preventDefault();const fd=new FormData(this),type=String(fd.get('type')||''),amount=Number(fd.get('amount')||0),description=String(fd.get('description')||'').trim(),date=String(fd.get('date')||'');if(!['Income','Expense'].includes(type)||amount<=0||!description||!date)return alert('Type, date, description and valid amount are required.');try{const data={type,amount,description,date,note:String(fd.get('note')||''),createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||''};const ref=await accountCol().add(data);accounts.push({id:ref.id,...data});this.reset();$('#accountModal')?.close();renderAccounts();renderDashboard();alert('Account entry saved successfully.')}catch(err){alert(firestoreError(err))}});
   });
 
   document.addEventListener('DOMContentLoaded',function(){
