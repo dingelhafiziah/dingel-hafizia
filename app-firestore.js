@@ -215,7 +215,8 @@
 
 
   document.addEventListener('DOMContentLoaded',function(){
-    $('#accountForm')?.addEventListener('submit',async function(e){e.preventDefault();const fd=new FormData(this),type=String(fd.get('type')||''),amount=Number(fd.get('amount')||0),description=String(fd.get('description')||'').trim(),date=String(fd.get('date')||'');if(!['Income','Expense'].includes(type)||amount<=0||!description||!date)return alert('Type, date, description and valid amount are required.');try{const data={type,amount,description,date,note:String(fd.get('note')||''),createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||''};const ref=await accountCol().add(data);accounts.push({id:ref.id,...data});this.reset();$('#accountModal')?.close();renderAccounts();renderDashboard();alert('Account entry saved successfully.')}catch(err){alert(firestoreError(err))}});
+    $('#accountForm')?.addEventListener('submit',async function(e){
+      if(!requireRole(['Admin']))return;e.preventDefault();const fd=new FormData(this),type=String(fd.get('type')||''),amount=Number(fd.get('amount')||0),description=String(fd.get('description')||'').trim(),date=String(fd.get('date')||'');if(!['Income','Expense'].includes(type)||amount<=0||!description||!date)return alert('Type, date, description and valid amount are required.');try{const data={type,amount,description,date,note:String(fd.get('note')||''),createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||''};const ref=await accountCol().add(data);accounts.push({id:ref.id,...data});this.reset();$('#accountModal')?.close();renderAccounts();renderDashboard();alert('Account entry saved successfully.')}catch(err){alert(firestoreError(err))}});
   });
 
   document.addEventListener('DOMContentLoaded',function(){
