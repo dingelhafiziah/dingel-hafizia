@@ -17,6 +17,7 @@
     if(page==='students'&&window.renderStudents)window.renderStudents();
     if(page==='fees'&&window.renderFees)window.renderFees();
     if(page==='accounts'&&window.renderAccounts)window.renderAccounts();
+    if(page==='reports'&&window.renderReports)window.renderReports();
     if(page==='dashboard'&&window.renderDashboard)window.renderDashboard();
     if(window.innerWidth<=900)window.toggleMenu(false);
   };
@@ -58,6 +59,9 @@
     $('#feeMonth')?.addEventListener('change',()=>window.renderFees&&window.renderFees());
     $('#accountType')?.addEventListener('change',()=>window.renderAccounts&&window.renderAccounts());
     $('#accountSearch')?.addEventListener('input',()=>window.renderAccounts&&window.renderAccounts());
+    $('#reportMonth')?.addEventListener('change',()=>window.renderReports&&window.renderReports());
+    $('#reportStatus')?.addEventListener('change',()=>window.renderReports&&window.renderReports());
+    $('#reportSearch')?.addEventListener('input',()=>window.renderReports&&window.renderReports());
     window.addEventListener('resize',()=>{if(window.innerWidth>900)window.toggleMenu(false)});
   });
 })();
