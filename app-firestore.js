@@ -28,6 +28,45 @@
   }
 
 
+
+  function paymentsForStudent(id,m){return payments.filter(p=>String(p.studentId)===String(id)&&(!m||monthKey(p.month)===m)).sort((a,b)=>String(b.paymentDate||'').localeCompare(String(a.paymentDate||'')))}
+  function accountTotals(m){const rows=accounts.filter(a=>!m||String(a.date||'').slice(0,7)===m);return {income:rows.filter(a=>a.type==='Income').reduce((x,a)=>x+Number(a.amount||0),0),expense:rows.filter(a=>a.type==='Expense').reduce((x,a)=>x+Number(a.amount||0),0)}}
+
+  window.renderReports=function(){
+    const m=$('#reportMonth')?.value||currentMonth(), status=$('#reportStatus')?.value||'Active', q=($('#reportSearch')?.value||'').trim().toLowerCase();
+    const rows=students.filter(s=>{const searchable=[s.admissionId,s.name,s.guardianName,s.phone,s.className,s.type].join(' ').toLowerCase();return (!status||(s.status||'Active')===status)&&(!q||searchable.includes(q))}).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+    let monthly=0,paid=0,due=0;
+    const tbody=$('#reportRows');
+    if(tbody)tbody.innerHTML=rows.map(s=>{const fm=feeForMonth(s),fp=paidForMonth(s.id,m),fd=Math.max(fm-fp,0);monthly+=fm;paid+=fp;due+=fd;const ps=paymentsForStudent(s.id,m);const last=ps[0];return `<tr><td>${esc(s.admissionId||s.roll||'—')}</td><td><b>${esc(s.name)}</b></td><td>${esc(s.className||'—')}</td><td>${esc(s.type||s.category||'Normal')}</td><td>₹${money(fm)}</td><td>₹${money(fp)}</td><td>₹${money(fd)}</td><td>${esc(s.status||'Active')}</td><td>${last?`<button onclick="printPaymentReceipt('${esc(last.id)}')">Print</button>`: '—'}</td></tr>`}).join('')||'<tr><td colspan="9" class="empty">No report records found</td></tr>';
+    const at=accountTotals(m); const income=at.income+paid, expense=at.expense;
+    const vals={reportStudents:rows.length,reportMonthly:money(monthly),reportPaid:money(paid),reportDue:money(due),reportIncome:money(income),reportExpense:money(expense),reportBalance:money(income-expense)};
+    Object.entries(vals).forEach(([id,v])=>{const el=$('#'+id);if(el)el.textContent=v});
+  };
+
+  window.showPaymentHistory=function(studentId){
+    const s=students.find(x=>String(x.id)===String(studentId));if(!s)return;
+    const rows=paymentsForStudent(studentId,''); const box=$('#paymentHistoryContent');if(!box)return;
+    const total=rows.reduce((x,p)=>x+Number(p.amount||0),0);
+    box.innerHTML=`<h3>${esc(s.name)}</h3><p>Admission ID: ${esc(s.admissionId||s.roll||'—')}</p><div class="table-wrap"><table><thead><tr><th>Date</th><th>Month</th><th>Amount</th><th>Note</th><th>Receipt</th></tr></thead><tbody>${rows.map(p=>`<tr><td>${esc(p.paymentDate||'—')}</td><td>${esc(p.month||'—')}</td><td>₹${money(p.amount)}</td><td>${esc(p.note||'—')}</td><td><button onclick="printPaymentReceipt('${esc(p.id)}')">Print</button></td></tr>`).join('')||'<tr><td colspan="5">No payments found</td></tr>'}</tbody></table></div><p><b>Total paid:</b> ₹${money(total)}</p>`;
+    $('#paymentHistoryModal').showModal();
+  };
+
+  window.printPaymentReceipt=function(paymentId){
+    const p=payments.find(x=>String(x.id)===String(paymentId));if(!p)return;
+    const s=students.find(x=>String(x.id)===String(p.studentId));
+    const receiptNo='DHA-'+String(p.id).slice(-8).toUpperCase();
+    const html=`<!doctype html><html><head><meta charset="utf-8"><title>Fee Receipt - ${esc(receiptNo)}</title><style>body{font-family:Arial,sans-serif;margin:0;padding:30px;color:#172b3a} .receipt{max-width:720px;margin:auto;border:1px solid #ddd;padding:28px;border-radius:12px}h1{text-align:center;margin:0 0 5px}h2{text-align:center;margin:0 0 25px;font-size:16px;font-weight:400}.row{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:10px 0}.amount{font-size:22px;font-weight:700;margin-top:20px}.foot{margin-top:35px;text-align:center;font-size:12px;color:#666}</style></head><body><div class="receipt"><h1>DINGEL HAFIZIA MADRASAH</h1><h2>Fee Payment Receipt</h2><div class="row"><b>Receipt No.</b><span>${esc(receiptNo)}</span></div><div class="row"><b>Student</b><span>${esc(s?.name||p.studentName||'—')}</span></div><div class="row"><b>Admission ID</b><span>${esc(s?.admissionId||p.admissionId||'—')}</span></div><div class="row"><b>Payment Month</b><span>${esc(p.month||'—')}</span></div><div class="row"><b>Payment Date</b><span>${esc(p.paymentDate||'—')}</span></div><div class="row"><b>Note</b><span>${esc(p.note||'—')}</span></div><div class="amount">Paid: ₹${money(p.amount)}</div><div class="foot">This is a computer-generated receipt.</div></div><script>window.onload=()=>window.print()<\/script></body></html>`;
+    const w=window.open('','_blank','width=800,height=700');if(!w)return alert('Please allow pop-ups to print the receipt.');w.document.write(html);w.document.close();
+  };
+
+  window.printMonthlyReport=function(){
+    const m=$('#reportMonth')?.value||currentMonth(),status=$('#reportStatus')?.value||'Active';
+    const rows=students.filter(s=>!status||(s.status||'Active')===status).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+    const body=rows.map(s=>{const fm=feeForMonth(s),fp=paidForMonth(s.id,m),fd=Math.max(fm-fp,0);return `<tr><td>${esc(s.admissionId||s.roll||'—')}</td><td>${esc(s.name)}</td><td>${esc(s.className||'—')}</td><td>₹${money(fm)}</td><td>₹${money(fp)}</td><td>₹${money(fd)}</td></tr>`}).join('');
+    const html=`<!doctype html><html><head><meta charset="utf-8"><title>Monthly Report ${esc(m)}</title><style>body{font-family:Arial;margin:25px}h1,h2{text-align:center}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f3f3f3}</style></head><body><h1>DINGEL HAFIZIA MADRASAH</h1><h2>Monthly Fee Report — ${esc(m)}</h2><table><thead><tr><th>Admission ID</th><th>Student</th><th>Class</th><th>Monthly</th><th>Paid</th><th>Due</th></tr></thead><tbody>${body}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`;
+    const w=window.open('','_blank','width=1000,height=800');if(!w)return alert('Please allow pop-ups to print the report.');w.document.write(html);w.document.close();
+  };
+
   window.renderDashboard=function(){
     const month=currentMonth(), active=students.filter(s=>(s.status||'Active')==='Active');
     const monthly=active.reduce((a,s)=>a+feeForMonth(s),0), paid=active.reduce((a,s)=>a+paidForMonth(s.id,month),0), due=Math.max(monthly-paid,0);
@@ -160,7 +199,7 @@
       if(alreadyPaid+amount>monthly)return alert('Payment cannot exceed the monthly fee. Current paid: ₹'+money(alreadyPaid)+'.');
       const data={studentId,studentName:student.name||'',admissionId:student.admissionId||student.roll||'',month,amount,paymentDate,note:fd.get('note')||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||''};
       try{
-        const ref=await paymentCol().add(data); payments.push({id:ref.id,...data}); setState(); this.reset(); $('#paymentModal')?.close(); renderFees(); renderStudents(); alert('Payment saved successfully.');
+        const ref=await paymentCol().add(data); payments.push({id:ref.id,...data}); setState(); this.reset(); $('#paymentModal')?.close(); renderFees(); renderStudents(); renderDashboard(); renderReports(); alert('Payment saved successfully.');
       }catch(err){alert(firestoreError(err))}
     });
   });
