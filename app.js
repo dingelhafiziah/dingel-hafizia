@@ -18,6 +18,8 @@
     if(page==='fees'&&window.renderFees)window.renderFees();
     if(page==='accounts'&&window.renderAccounts)window.renderAccounts();
     if(page==='reports'&&window.renderReports)window.renderReports();
+    if(page==='attendance'&&window.renderAttendance)window.renderAttendance();
+    if(page==='hifz'&&window.renderHifz)window.renderHifz();
     if(page==='dashboard'&&window.renderDashboard)window.renderDashboard();
     if(window.innerWidth<=900)window.toggleMenu(false);
   };
@@ -62,6 +64,10 @@
     $('#reportMonth')?.addEventListener('change',()=>window.renderReports&&window.renderReports());
     $('#reportStatus')?.addEventListener('change',()=>window.renderReports&&window.renderReports());
     $('#reportSearch')?.addEventListener('input',()=>window.renderReports&&window.renderReports());
+    $('#attendanceDate')?.addEventListener('change',()=>window.renderAttendance&&window.renderAttendance());
+    $('#attendanceClass')?.addEventListener('change',()=>window.renderAttendance&&window.renderAttendance());
+    $('#attendanceSearch')?.addEventListener('input',()=>window.renderAttendance&&window.renderAttendance());
+    $('#attendanceRows')?.addEventListener('change',()=>window.updateAttendanceSummary&&window.updateAttendanceSummary());
     window.addEventListener('resize',()=>{if(window.innerWidth>900)window.toggleMenu(false)});
   });
 })();
