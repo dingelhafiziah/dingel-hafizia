@@ -1,11 +1,32 @@
 // Firebase Authentication integration.
 (function(){
   const LOGIN_ERROR={'auth/invalid-email':'Invalid email address.','auth/user-disabled':'This account has been disabled.','auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-credential':'Email or password is incorrect.','auth/too-many-requests':'Too many attempts. Please try again later.','auth/network-request-failed':'Network connection failed. Please try again.'};
+
+  let profile=null;
+  window.dhRole='Teacher';
+  window.dhProfile=null;
+  const ROLE_PERMISSIONS={Admin:['dashboard','students','fees','accounts','reports','settings'],Teacher:['dashboard','students','fees','reports']};
+  function can(page){return (ROLE_PERMISSIONS[window.dhRole]||[]).includes(page)}
+  window.dhCan=can;
+  function applyRoleUI(){
+    document.querySelectorAll('.nav-btn[data-page]').forEach(btn=>{const p=btn.dataset.page;btn.style.display=can(p)?'':'none'});
+    document.querySelectorAll('[data-admin-only]').forEach(el=>el.style.display=window.dhRole==='Admin'?'':'none');
+    const label=document.querySelector('#userRole');if(label)label.textContent=window.dhRole;
+  }
+  async function loadProfile(user){
+    try{
+      const snap=await firebase.firestore().collection('users').doc(user.uid).get();
+      if(snap.exists) profile=snap.data();
+      else profile={role:'Teacher',name:user.email||'Teacher',email:user.email||''};
+      window.dhProfile=profile;window.dhRole=profile.role==='Admin'?'Admin':'Teacher';
+      applyRoleUI();
+    }catch(e){console.error('Profile load failed',e);window.dhRole='Teacher';applyRoleUI()}
+  }
   function setLoading(loading){const b=document.querySelector('#loginForm button[type="submit"]');if(b){b.disabled=loading;b.textContent=loading?'SIGNING IN...':'LOGIN';}}
   window.login=async function(){const email=document.querySelector('#username').value.trim(),password=document.querySelector('#password').value;if(!email||!password)return;setLoading(true);try{await dhAuth.signInWithEmailAndPassword(email,password)}catch(e){alert(LOGIN_ERROR[e.code]||e.message||'Login failed. Please try again.')}finally{setLoading(false)}};
   window.logout=async function(){try{await dhAuth.signOut()}catch(e){alert(e.message||'Logout failed. Please try again.')}};
   window.boot=function(){};
-  function showPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));const target=document.querySelector('#page-'+page);if(target)target.classList.remove('hidden');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));if(page==='students'&&window.renderStudents)window.renderStudents();if(page==='fees'&&window.renderFees)window.renderFees();if(window.innerWidth<=900&&window.toggleMenu)window.toggleMenu(false)}
+  function showPage(page){if(!can(page))page='dashboard';document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));const target=document.querySelector('#page-'+page);if(target)target.classList.remove('hidden');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));if(page==='students'&&window.renderStudents)window.renderStudents();if(page==='fees'&&window.renderFees)window.renderFees();if(window.innerWidth<=900&&window.toggleMenu)window.toggleMenu(false)}
   document.addEventListener('DOMContentLoaded',function(){
     const login=document.querySelector('#login'),app=document.querySelector('#app'),form=document.querySelector('#loginForm');
     app.classList.add('hidden');
@@ -14,14 +35,15 @@
     const username=document.querySelector('#username'),label=username?.closest('.field')?.querySelector('label');if(label)label.textContent='Email';if(username){username.type='email';username.autocomplete='email';username.placeholder='admin@example.com'}
     let resolved=false;
     try{
-      dhAuth.onAuthStateChanged(function(user){
+      dhAuth.onAuthStateChanged(async function(user){
         resolved=true;
         document.body.classList.add('auth-ready');
         if(user){
+          await loadProfile(user);
           login.classList.add('hidden');
           app.classList.remove('hidden');
           showPage('dashboard');
-          const su=document.querySelector('#signedInUser');if(su)su.textContent='Signed in: '+(user.email||'');
+          const su=document.querySelector('#signedInUser');if(su)su.textContent='Signed in: '+(user.email||'')+' | Role: '+window.dhRole;
         }else{
           app.classList.add('hidden');
           login.classList.remove('hidden');
