@@ -106,6 +106,41 @@
     if($('#feeTotalStudents'))$('#feeTotalStudents').textContent=rows.length;if($('#feeTotalMonthly'))$('#feeTotalMonthly').textContent=money(tm);if($('#feeTotalPaid'))$('#feeTotalPaid').textContent=money(tp);if($('#feeTotalDue'))$('#feeTotalDue').textContent=money(td);
   };
 
+  window.addPayment=function(){
+    const form=$('#paymentForm'), modal=$('#paymentModal'), select=$('#paymentStudent');
+    if(!form||!modal||!select)return;
+    const active=students.filter(s=>(s.status||'Active')==='Active').sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+    select.innerHTML=active.map(s=>'<option value="'+esc(s.id)+'">'+esc((s.admissionId||s.roll||'—')+' — '+(s.name||''))+'</option>').join('');
+    form.reset();
+    $('#paymentMonth').value=currentMonth();
+    const d=new Date(); $('#paymentForm [name="paymentDate"]').value=d.toISOString().slice(0,10);
+    modal.showModal();
+  };
+
+  window.addPaymentFor=function(studentId,month){
+    window.addPayment();
+    if($('#paymentStudent'))$('#paymentStudent').value=String(studentId);
+    if($('#paymentMonth'))$('#paymentMonth').value=month||currentMonth();
+  };
+
+  document.addEventListener('DOMContentLoaded',function(){
+    $('#paymentForm')?.addEventListener('submit',async function(e){
+      e.preventDefault();
+      if(!db)return alert('Database is not ready.');
+      const fd=new FormData(this), studentId=String(fd.get('paymentStudent')||''), month=monthKey(fd.get('paymentMonth'));
+      const amount=Number(fd.get('amount')||0), paymentDate=String(fd.get('paymentDate')||'');
+      if(!studentId||!month||amount<=0||!paymentDate)return alert('Student, month, valid paid amount and payment date are required.');
+      const student=students.find(s=>String(s.id)===studentId); if(!student)return alert('Student not found.');
+      const monthly=feeForMonth(student), alreadyPaid=paidForMonth(studentId,month);
+      if(monthly===0)return alert('This student has no monthly fee.');
+      if(alreadyPaid+amount>monthly)return alert('Payment cannot exceed the monthly fee. Current paid: ₹'+money(alreadyPaid)+'.');
+      const data={studentId,studentName:student.name||'',admissionId:student.admissionId||student.roll||'',month,amount,paymentDate,note:fd.get('note')||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser?.uid||''};
+      try{
+        const ref=await paymentCol().add(data); payments.push({id:ref.id,...data}); setState(); this.reset(); $('#paymentModal')?.close(); renderFees(); renderStudents(); alert('Payment saved successfully.');
+      }catch(err){alert(firestoreError(err))}
+    });
+  });
+
   document.addEventListener('DOMContentLoaded',function(){
     dhAuth.onAuthStateChanged(async user=>{currentUser=user;if(!user)return;try{db=firebase.firestore();await load()}catch(e){alert(firestoreError(e))}});
   });
