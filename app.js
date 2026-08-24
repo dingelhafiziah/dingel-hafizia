@@ -56,13 +56,13 @@
   window.editStudent=function(id){
     const s=(window.dhStudents||[]).find(x=>String(x.id)===String(id)); if(!s)return;
     window.__dhCurrentStudentId=s.id;
-    const f=$('#studentForm'); if(!f)return;
+    const modal=$('#studentModal'),f=$('#studentForm'); if(!modal||!f)return;
     $('#studentModalTitle').textContent='Edit Student';
     $('#studentAdmissionId').value=s.admissionId||s.roll||''; $('#studentAdmissionId').readOnly=true;
     $('#studentName').value=s.name||'';
     $('#studentDob').value=s.dob||''; $('#studentAadhaar').value=s.studentAadhaar||'';
     $('#guardianName').value=s.guardianName||s.father||''; $('#guardianPhone').value=s.guardianPhone||'';
-    $('#guardianAadhaar').value=s.guardianAadhaar||s.fatherAadhaar||''; $('#phone').value=s.phone||'';
+    $('#guardianAadhaar').value=s.guardianAadhaar||s.fatherAadhaar||'';
     $('#address').value=s.address||''; $('#studentClass').value=s.className||'Maktab';
     $('#studentType').value=s.type||s.category||'Normal'; $('#monthlyFees').value=s.monthlyFees??0;
     $('#admissionDate').value=s.admissionDate||''; $('#admissionDate').readOnly=true;
