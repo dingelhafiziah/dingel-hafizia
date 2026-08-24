@@ -17,7 +17,7 @@
     try{
       const snap=await firebase.firestore().collection('users').doc(user.uid).get();
       if(snap.exists) profile=snap.data();
-      else profile={role:'Teacher',name:user.email||'Teacher',email:user.email||''};
+      else {profile={role:'Teacher',name:user.email||'Teacher',email:user.email||'',createdAt:firebase.firestore.FieldValue.serverTimestamp()};try{await firebase.firestore().collection('users').doc(user.uid).set(profile,{merge:true})}catch(e){console.warn('Could not create profile',e)}}
       window.dhProfile=profile;window.dhRole=profile.role==='Admin'?'Admin':'Teacher';
       applyRoleUI();
     }catch(e){console.error('Profile load failed',e);window.dhRole='Teacher';applyRoleUI()}
