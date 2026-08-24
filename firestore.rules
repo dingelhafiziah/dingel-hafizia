@@ -13,11 +13,11 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return userRole() == 'Admin';
+      return userRole() in ['Admin', 'admin'];
     }
 
     function isTeacher() {
-      return userRole() == 'Teacher';
+      return userRole() in ['Teacher', 'teacher'];
     }
 
     function staff() {
@@ -25,13 +25,19 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
+      // A signed-in user can read only their own profile; Admin can read all staff profiles.
       allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
-      allow create: if signedIn()
-        && request.auth.uid == userId
-        && request.resource.data.role == 'Teacher';
+
+      // Only an existing Admin can create another staff profile.
+      // This prevents an arbitrary authenticated user from granting themselves a role.
+      allow create: if isAdmin()
+        && request.resource.data.role in ['Teacher', 'teacher'];
+
+      // Admin manages profiles. A user may update their own profile only without changing role.
       allow update: if isAdmin()
         || (signedIn() && request.auth.uid == userId
             && request.resource.data.role == resource.data.role);
+
       allow delete: if isAdmin();
     }
 
