@@ -3,6 +3,8 @@
   const LOGIN_ERROR={'auth/invalid-email':'Invalid email address.','auth/user-disabled':'This account has been disabled.','auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-credential':'Email or password is incorrect.','auth/too-many-requests':'Too many attempts. Please try again later.','auth/network-request-failed':'Network connection failed. Please try again.'};
 
   let profile=null;
+  let resolveAuthReady;
+  window.dhAuthReady=new Promise(resolve=>{resolveAuthReady=resolve});
   window.dhRole='Teacher';
   window.dhProfile=null;
   const ROLE_PERMISSIONS={Admin:['dashboard','students','fees','accounts','reports','settings'],Teacher:['dashboard','students','fees','reports']};
@@ -40,6 +42,7 @@
         document.body.classList.add('auth-ready');
         if(user){
           await loadProfile(user);
+          resolveAuthReady(user); 
           login.classList.add('hidden');
           app.classList.remove('hidden');
           showPage('dashboard');
@@ -47,6 +50,7 @@
         }else{
           app.classList.add('hidden');
           login.classList.remove('hidden');
+          resolveAuthReady(null);
           const p=document.querySelector('#password');if(p)p.value='';
         }
       });
