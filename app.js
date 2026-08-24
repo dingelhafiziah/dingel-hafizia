@@ -2,6 +2,14 @@
 (function(){
   const $=s=>document.querySelector(s);
 
+  function todayISO(){
+    const d=new Date();
+    const y=d.getFullYear();
+    const m=String(d.getMonth()+1).padStart(2,'0');
+    const day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
   function nextAdmissionId(){
     const students=window.dhStudents||[];
     let max=0;
@@ -40,6 +48,8 @@
     $('#studentAdmissionId').value=nextAdmissionId();
     $('#studentAdmissionId').readOnly=true;
     $('#studentStatus').value='Active'; $('#studentType').value='Normal'; $('#studentClass').value='Maktab';
+    $('#admissionDate').value=todayISO();
+    $('#admissionDate').readOnly=true;
     $('#monthlyFees').disabled=false; modal.showModal();
   };
 
@@ -55,7 +65,8 @@
     $('#guardianAadhaar').value=s.guardianAadhaar||s.fatherAadhaar||''; $('#phone').value=s.phone||'';
     $('#address').value=s.address||''; $('#studentClass').value=s.className||'Maktab';
     $('#studentType').value=s.type||s.category||'Normal'; $('#monthlyFees').value=s.monthlyFees??0;
-    $('#admissionDate').value=s.admissionDate||''; $('#studentStatus').value=s.status||'Active';
+    $('#admissionDate').value=s.admissionDate||''; $('#admissionDate').readOnly=true;
+    $('#studentStatus').value=s.status||'Active';
     $('#studentPhoto').value=''; $('#monthlyFees').disabled=['Atim','Poor-Free'].includes($('#studentType').value);
     modal.showModal();
   };
