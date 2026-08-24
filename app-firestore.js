@@ -12,9 +12,7 @@
   const paymentRef=id=>paymentCol().doc(String(id));
   const accountCol=()=>db.collection('accounts');
   let accounts=[];
-  let students=[],payments=[],attendance=[],hifz=[];
-  const attendanceCol=()=>db.collection('attendance');
-  const hifzCol=()=>db.collection('hifzProgress');
+  let students=[],payments=[];
 
   function setState(){window.dhStudents=students;window.dhPayments=payments}
   function firestoreError(e){console.error(e);return `Firestore connection failed: ${e?.code||'unknown-error'}`}
@@ -23,32 +21,17 @@
   function paidForMonth(id,m){return payments.filter(p=>String(p.studentId)===String(id)&&monthKey(p.month)===m).reduce((a,p)=>a+Number(p.amount||0),0)}
 
   async function load(){
-    const base=[studentCol().get(),paymentCol().get(),attendanceCol().get(),hifzCol().get()];
+    const base=[studentCol().get(),paymentCol().get()];
     if(window.dhRole==='Admin')base.push(accountCol().get());
-    const [ss,ps,ats,hs,as]=await Promise.all(base);
+    const [ss,ps,as]=await Promise.all(base);
     students=ss.docs.map(d=>({id:d.id,...d.data()}));
     payments=ps.docs.map(d=>({id:d.id,...d.data()}));
-    attendance=ats.docs.map(d=>({id:d.id,...d.data()}));
-    hifz=hs.docs.map(d=>({id:d.id,...d.data()}));
     accounts=as?as.docs.map(d=>({id:d.id,...d.data()})):[];
-    setState(); renderStudents(); renderFees(); renderAccounts(); renderDashboard(); renderAttendance(); renderHifz();
+    setState(); renderStudents(); renderFees(); renderAccounts(); renderDashboard();
   }
 
 
 
-
-  function today(){return new Date().toISOString().slice(0,10)}
-  window.renderAttendance=function(){
-    const date=$('#attendanceDate')?.value||today(), cls=$('#attendanceClass')?.value||'', q=($('#attendanceSearch')?.value||'').toLowerCase();
-    const rows=students.filter(s=>(s.status||'Active')==='Active'&&(!cls||s.className===cls)&&(!q||[s.name,s.admissionId,s.phone].join(' ').toLowerCase().includes(q)));
-    const tbody=$('#attendanceRows');if(!tbody)return;
-    tbody.innerHTML=rows.map(s=>{const rec=attendance.find(a=>String(a.studentId)===String(s.id)&&a.date===date);return `<tr><td>${esc(s.admissionId||s.roll||'—')}</td><td><b>${esc(s.name)}</b></td><td>${esc(s.className||'—')}</td><td><select data-att-id="${esc(s.id)}" class="att-status"><option ${rec?.status==='Present'?'selected':''}>Present</option><option ${rec?.status==='Absent'?'selected':''}>Absent</option><option ${rec?.status==='Leave'?'selected':''}>Leave</option></select></td><td><input data-att-note="${esc(s.id)}" value="${esc(rec?.note||'')}" placeholder="Note"></td></tr>`}).join('')||'<tr><td colspan="5" class="empty">No students found</td></tr>';
-    updateAttendanceSummary();
-  };
-  function updateAttendanceSummary(){const rows=[...document.querySelectorAll('.att-status')],count=x=>rows.filter(s=>s.value===x).length;[['attendancePresent','Present'],['attendanceAbsent','Absent'],['attendanceLeave','Leave']].forEach(([id,v])=>{const e=$('#'+id);if(e)e.textContent=count(v)});const e=$('#attendanceTotal');if(e)e.textContent=rows.length}
-  window.saveAttendance=async function(){if(!requireRole(['Admin','Teacher']))return;const date=$('#attendanceDate')?.value||today();const rows=[...document.querySelectorAll('.att-status')];if(!rows.length)return alert('No students found.');try{const batch=db.batch();rows.forEach(sel=>{const id=sel.dataset.attId,note=document.querySelector(`[data-att-note="${CSS.escape(id)}"]`)?.value||'';const ref=attendanceCol().doc(`${date}_${id}`);batch.set(ref,{studentId:id,date,status:sel.value,note,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser?.uid||''},{merge:true})});await batch.commit();await load();alert('Attendance saved successfully.')}catch(e){alert(firestoreError(e))}};
-  window.renderHifz=function(){const sel=$('#hifzStudent');if(!sel)return;const active=students.filter(s=>(s.status||'Active')==='Active').sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));sel.innerHTML=active.map(s=>`<option value="${esc(s.id)}">${esc((s.admissionId||s.roll||'—')+' — '+s.name)}</option>`).join('');const rows=hifz.slice().sort((a,b)=>String(b.updatedDate||'').localeCompare(String(a.updatedDate||'')));const tbody=$('#hifzRows');if(tbody)tbody.innerHTML=rows.map(r=>{const s=students.find(x=>String(x.id)===String(r.studentId));return `<tr><td>${esc(s?.name||r.studentName||'—')}</td><td>${esc(r.juz??'0')}</td><td>${esc(r.surah||'—')}</td><td>${esc(r.ayah??'0')}</td><td>${esc(r.updatedDate||'—')}</td><td>${esc(r.note||'—')}</td></tr>`}).join('')||'<tr><td colspan="6" class="empty">No Hifz progress found</td></tr>'};
-  window.saveHifzProgress=async function(){if(!requireRole(['Admin','Teacher']))return;const studentId=$('#hifzStudent')?.value;if(!studentId)return alert('Select a student.');const s=students.find(x=>String(x.id)===String(studentId));const data={studentId,studentName:s?.name||'',juz:Number($('#hifzJuz')?.value||0),surah:$('#hifzSurah')?.value||'',ayah:Number($('#hifzAyah')?.value||0),note:$('#hifzNote')?.value||'',updatedDate:today(),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser?.uid||''};try{await hifzCol().doc(studentId).set(data,{merge:true});const old=hifz.findIndex(x=>String(x.id)===String(studentId));const item={id:studentId,...data};if(old>=0)hifz[old]=item;else hifz.push(item);renderHifz();$('#hifzJuz').value='';$('#hifzSurah').value='';$('#hifzAyah').value='';$('#hifzNote').value='';alert('Hifz progress saved successfully.')}catch(e){alert(firestoreError(e))}};
 
   function paymentsForStudent(id,m){return payments.filter(p=>String(p.studentId)===String(id)&&(!m||monthKey(p.month)===m)).sort((a,b)=>String(b.paymentDate||'').localeCompare(String(a.paymentDate||'')))}
   function accountTotals(m){const rows=accounts.filter(a=>!m||String(a.date||'').slice(0,7)===m);return {income:rows.filter(a=>a.type==='Income').reduce((x,a)=>x+Number(a.amount||0),0),expense:rows.filter(a=>a.type==='Expense').reduce((x,a)=>x+Number(a.amount||0),0)}}
