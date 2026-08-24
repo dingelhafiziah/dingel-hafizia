@@ -21,10 +21,12 @@
   function paidForMonth(id,m){return payments.filter(p=>String(p.studentId)===String(id)&&monthKey(p.month)===m).reduce((a,p)=>a+Number(p.amount||0),0)}
 
   async function load(){
-    const [ss,ps,as]=await Promise.all([studentCol().get(),paymentCol().get(),accountCol().get()]);
+    const base=[studentCol().get(),paymentCol().get()];
+    if(window.dhRole==='Admin')base.push(accountCol().get());
+    const [ss,ps,as]=await Promise.all(base);
     students=ss.docs.map(d=>({id:d.id,...d.data()}));
     payments=ps.docs.map(d=>({id:d.id,...d.data()}));
-    accounts=as.docs.map(d=>({id:d.id,...d.data()}));
+    accounts=as?as.docs.map(d=>({id:d.id,...d.data()})):[];
     setState(); renderStudents(); renderFees(); renderAccounts(); renderDashboard();
   }
 
