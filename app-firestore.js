@@ -220,6 +220,6 @@
   });
 
   document.addEventListener('DOMContentLoaded',function(){
-    dhAuth.onAuthStateChanged(async user=>{currentUser=user;if(!user)return;try{db=firebase.firestore();await load()}catch(e){alert(firestoreError(e))}});
+    dhAuth.onAuthStateChanged(async user=>{currentUser=user;if(!user)return;try{if(window.dhAuthReady)await window.dhAuthReady;db=firebase.firestore();await load()}catch(e){alert(firestoreError(e))}});
   });
 })();
