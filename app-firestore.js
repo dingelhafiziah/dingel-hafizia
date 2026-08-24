@@ -16,6 +16,7 @@
 
   function setState(){window.dhStudents=students;window.dhPayments=payments}
   function firestoreError(e){console.error(e);return `Firestore connection failed: ${e?.code||'unknown-error'}`}
+  function requireRole(roles){if(!roles.includes(window.dhRole)){alert('You do not have permission to perform this action.');return false}return true}
   function feeForMonth(s){return ['Atim','Poor-Free'].includes(s.type||s.category)?0:Number(s.monthlyFees||0)}
   function paidForMonth(id,m){return payments.filter(p=>String(p.studentId)===String(id)&&monthKey(p.month)===m).reduce((a,p)=>a+Number(p.amount||0),0)}
 
@@ -84,8 +85,10 @@
     const tbody=$('#accountRows');if(tbody)tbody.innerHTML=rows.map(a=>`<tr><td>${esc(a.date||'—')}</td><td>${esc(a.type)}</td><td>${esc(a.description)}</td><td>₹${money(a.amount)}</td><td><button class="danger" onclick="deleteAccountEntry('${esc(a.id)}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No account entries found</td></tr>';
   };
 
-  window.addAccountEntry=function(){const m=$('#accountModal'),f=$('#accountForm');if(!m||!f)return;f.reset();f.querySelector('[name="date"]').value=new Date().toISOString().slice(0,10);m.showModal()};
-  window.deleteAccountEntry=async function(id){if(!confirm('Delete this account entry?'))return;try{await accountCol().doc(String(id)).delete();accounts=accounts.filter(a=>String(a.id)!==String(id));renderAccounts();renderDashboard()}catch(e){alert(firestoreError(e))}};
+  window.addAccountEntry=function(){
+    if(!requireRole(['Admin']))return;const m=$('#accountModal'),f=$('#accountForm');if(!m||!f)return;f.reset();f.querySelector('[name="date"]').value=new Date().toISOString().slice(0,10);m.showModal()};
+  window.deleteAccountEntry=async function(id){
+    if(!requireRole(['Admin']))return;if(!confirm('Delete this account entry?'))return;try{await accountCol().doc(String(id)).delete();accounts=accounts.filter(a=>String(a.id)!==String(id));renderAccounts();renderDashboard()}catch(e){alert(firestoreError(e))}};
 
   window.renderStudents=function(){
     const q=($('#studentSearch')?.value||'').trim().toLowerCase();
@@ -115,6 +118,7 @@
   };
 
   window.saveStudent=async function(fd){
+    if(!requireRole(['Admin','Teacher']))return;
     if(!db)return alert('Database is not ready.');
     const id=window.__dhCurrentStudentId;
     const type=fd.get('studentType')||'Normal';
@@ -147,6 +151,7 @@
   };
 
   window.archiveStudent=async function(id){
+    if(!requireRole(['Admin','Teacher']))return;
     const s=students.find(x=>String(x.id)===String(id));if(!s)return;
     if(!confirm(`“${s.name}” student record archive করতে চান?`))return;
     try{await studentRef(id).update({status:'Archived',updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser?.uid||''});students=students.map(x=>String(x.id)===String(id)?{...x,status:'Archived'}:x);setState();$('#studentActionModal')?.close();$('#detailsModal')?.close();renderStudents();renderFees();alert('Student archived successfully.')}catch(e){alert(firestoreError(e))}
@@ -170,6 +175,7 @@
   };
 
   window.addPayment=function(){
+    if(!requireRole(['Admin','Teacher']))return;
     const form=$('#paymentForm'), modal=$('#paymentModal'), select=$('#paymentStudent');
     if(!form||!modal||!select)return;
     const active=students.filter(s=>(s.status||'Active')==='Active').sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
