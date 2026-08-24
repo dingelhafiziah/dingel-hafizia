@@ -2,6 +2,17 @@
 (function(){
   const $=s=>document.querySelector(s);
 
+  function nextAdmissionId(){
+    const students=window.dhStudents||[];
+    let max=0;
+    students.forEach(s=>{
+      const value=String(s.admissionId||s.roll||'').trim();
+      const match=value.match(/^DH-(\d+)$/i);
+      if(match)max=Math.max(max,Number(match[1]));
+    });
+    return `DH-${String(max+1).padStart(3,'0')}`;
+  }
+
   window.toggleMenu=function(force){
     const sidebar=$('#sidebar'),overlay=$('#menuOverlay'),btn=$('#menuBtn');
     if(!sidebar||!overlay||!btn)return;
@@ -26,6 +37,8 @@
     window.__dhCurrentStudentId=null;
     const modal=$('#studentModal'),form=$('#studentForm'); if(!modal||!form)return;
     $('#studentModalTitle').textContent='Add Student'; form.reset();
+    $('#studentAdmissionId').value=nextAdmissionId();
+    $('#studentAdmissionId').readOnly=true;
     $('#studentStatus').value='Active'; $('#studentType').value='Normal'; $('#studentClass').value='Maktab';
     $('#monthlyFees').disabled=false; modal.showModal();
   };
@@ -35,7 +48,8 @@
     window.__dhCurrentStudentId=s.id;
     const f=$('#studentForm'); if(!f)return;
     $('#studentModalTitle').textContent='Edit Student';
-    $('#studentAdmissionId').value=s.admissionId||s.roll||''; $('#studentName').value=s.name||'';
+    $('#studentAdmissionId').value=s.admissionId||s.roll||''; $('#studentAdmissionId').readOnly=true;
+    $('#studentName').value=s.name||'';
     $('#studentDob').value=s.dob||''; $('#studentAadhaar').value=s.studentAadhaar||'';
     $('#guardianName').value=s.guardianName||s.father||''; $('#guardianPhone').value=s.guardianPhone||'';
     $('#guardianAadhaar').value=s.guardianAadhaar||s.fatherAadhaar||''; $('#phone').value=s.phone||'';
