@@ -1,18 +1,54 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    function signedIn() {
+      return request.auth != null;
     }
+
+    function userRole() {
+      return signedIn()
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : null;
+    }
+
+    function isAdmin() {
+      return userRole() == 'Admin';
+    }
+
+    function isTeacher() {
+      return userRole() == 'Teacher';
+    }
+
+    function staff() {
+      return isAdmin() || isTeacher();
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == 'Teacher';
+      allow update: if isAdmin()
+        || (signedIn() && request.auth.uid == userId
+            && request.resource.data.role == resource.data.role);
+      allow delete: if isAdmin();
+    }
+
     match /students/{studentId} {
-      allow read, write: if request.auth != null;
+      allow read, create, update: if staff();
+      allow delete: if isAdmin();
     }
+
     match /payments/{paymentId} {
-      allow read, write: if request.auth != null;
+      allow read, create, update: if staff();
+      allow delete: if isAdmin();
     }
+
     match /accounts/{entryId} {
-      allow read, write: if request.auth != null;
+      allow read, create, update, delete: if isAdmin();
     }
+
     match /{document=**} {
       allow read, write: if false;
     }
