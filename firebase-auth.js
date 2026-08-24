@@ -1,64 +1,18 @@
 // Firebase Authentication integration.
 (function(){
-  const LOGIN_ERROR={'auth/invalid-email':'Invalid email address.','auth/user-disabled':'This account has been disabled.','auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-credential':'Email or password is incorrect.','auth/too-many-requests':'Too many attempts. Please try again later.','auth/network-request-failed':'Network connection failed. Please try again.'};
-
-  let profile=null;
-  let resolveAuthReady;
-  window.dhAuthReady=new Promise(resolve=>{resolveAuthReady=resolve});
-  window.dhRole='Teacher';
-  window.dhProfile=null;
+  const LOGIN_ERROR={'auth/invalid-email':'Invalid email address.','auth/user-disabled':'This account has been disabled.','auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-credential':'Email or password is incorrect.','auth/too-many-requests':'Too many attempts. Please try again later.','auth/network-request-failed':'Network connection failed. Please try again.','auth/requires-recent-login':'For security, please sign in again and then change the password.'};
+  let profile=null;let resolveAuthReady;window.dhAuthReady=new Promise(resolve=>{resolveAuthReady=resolve});window.dhRole='Teacher';window.dhProfile=null;
   const ROLE_PERMISSIONS={Admin:['dashboard','students','fees','accounts','reports','settings'],Teacher:['dashboard','students','fees','reports']};
-  function can(page){return (ROLE_PERMISSIONS[window.dhRole]||[]).includes(page)}
-  window.dhCan=can;
-  function applyRoleUI(){
-    document.querySelectorAll('.nav-btn[data-page]').forEach(btn=>{const p=btn.dataset.page;btn.style.display=can(p)?'':'none'});
-    document.querySelectorAll('[data-admin-only]').forEach(el=>el.style.display=window.dhRole==='Admin'?'':'none');
-    const label=document.querySelector('#userRole');if(label)label.textContent=window.dhRole;
-  }
-  async function loadProfile(user){
-    try{
-      const snap=await firebase.firestore().collection('users').doc(user.uid).get();
-      if(snap.exists) profile=snap.data();
-      else {profile={role:'Teacher',name:user.email||'Teacher',email:user.email||'',createdAt:firebase.firestore.FieldValue.serverTimestamp()};try{await firebase.firestore().collection('users').doc(user.uid).set(profile,{merge:true})}catch(e){console.warn('Could not create profile',e)}}
-      window.dhProfile=profile;window.dhRole=profile.role==='Admin'?'Admin':'Teacher';
-      applyRoleUI();
-    }catch(e){console.error('Profile load failed',e);window.dhRole='Teacher';applyRoleUI()}
-  }
-  function setLoading(loading){const b=document.querySelector('#loginForm button[type="submit"]');if(b){b.disabled=loading;b.textContent=loading?'SIGNING IN...':'LOGIN';}}
+  function can(page){return (ROLE_PERMISSIONS[window.dhRole]||[]).includes(page)}window.dhCan=can;
+  function applyRoleUI(){document.querySelectorAll('.nav-btn[data-page]').forEach(btn=>{btn.style.display=can(btn.dataset.page)?'':''});document.querySelectorAll('[data-admin-only]').forEach(el=>el.style.display=window.dhRole==='Admin'?'':'none');const label=document.querySelector('#userRole');if(label)label.textContent=window.dhRole}
+  async function loadProfile(user){try{const snap=await firebase.firestore().collection('users').doc(user.uid).get();if(snap.exists)profile=snap.data();else{profile={role:'Teacher',name:user.email||'Teacher',email:user.email||'',createdAt:firebase.firestore.FieldValue.serverTimestamp()};try{await firebase.firestore().collection('users').doc(user.uid).set(profile,{merge:true})}catch(e){console.warn('Could not create profile',e)}}window.dhProfile=profile;window.dhRole=profile.role==='Admin'?'Admin':'Teacher';applyRoleUI()}catch(e){console.error('Profile load failed',e);window.dhRole='Teacher';applyRoleUI()}}
+  function setLoading(loading){const b=document.querySelector('#loginForm button[type="submit"]');if(b){b.disabled=loading;b.textContent=loading?'SIGNING IN...':'LOGIN'}}
   window.login=async function(){const email=document.querySelector('#username').value.trim(),password=document.querySelector('#password').value;if(!email||!password)return;setLoading(true);try{await dhAuth.signInWithEmailAndPassword(email,password)}catch(e){alert(LOGIN_ERROR[e.code]||e.message||'Login failed. Please try again.')}finally{setLoading(false)}};
-  window.logout=async function(){try{await dhAuth.signOut()}catch(e){alert(e.message||'Logout failed. Please try again.')}};
-  window.boot=function(){};
-  function showPage(page){if(!can(page))page='dashboard';document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));const target=document.querySelector('#page-'+page);if(target)target.classList.remove('hidden');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));if(page==='students'&&window.renderStudents)window.renderStudents();if(page==='fees'&&window.renderFees)window.renderFees();if(window.innerWidth<=900&&window.toggleMenu)window.toggleMenu(false)}
-  document.addEventListener('DOMContentLoaded',function(){
-    const login=document.querySelector('#login'),app=document.querySelector('#app'),form=document.querySelector('#loginForm');
-    app.classList.add('hidden');
-    if(form)form.addEventListener('submit',function(e){e.preventDefault();e.stopImmediatePropagation();window.login()},true);
-    document.querySelectorAll('.nav-btn[data-page]').forEach(btn=>btn.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();showPage(btn.dataset.page)},true));
-    const username=document.querySelector('#username'),label=username?.closest('.field')?.querySelector('label');if(label)label.textContent='Email';if(username){username.type='email';username.autocomplete='email';username.placeholder='admin@example.com'}
-    let resolved=false;
-    try{
-      dhAuth.onAuthStateChanged(async function(user){
-        resolved=true;
-        document.body.classList.add('auth-ready');
-        if(user){
-          await loadProfile(user);
-          resolveAuthReady(user); 
-          login.classList.add('hidden');
-          app.classList.remove('hidden');
-          showPage('dashboard');
-          const su=document.querySelector('#signedInUser');if(su)su.textContent='Signed in: '+(user.email||'')+' | Role: '+window.dhRole;
-        }else{
-          app.classList.add('hidden');
-          login.classList.remove('hidden');
-          resolveAuthReady(null);
-          const p=document.querySelector('#password');if(p)p.value='';
-        }
-      });
-    }catch(e){
-      console.error('Firebase Auth initialization failed:',e);
-      app.classList.add('hidden');
-      login.classList.remove('hidden');
-    }
-    setTimeout(function(){if(!resolved){app.classList.add('hidden');login.classList.remove('hidden')}} ,5000);
-  });
+  window.logout=async function(){try{await dhAuth.signOut()}catch(e){alert(e.message||'Logout failed. Please try again.')}};window.boot=function(){};
+  window.changePassword=async function(){const user=dhAuth.currentUser;if(!user){alert('Please login first.');return}const current=document.querySelector('#currentPassword')?.value||'',next=document.querySelector('#newPassword')?.value||'',confirm=document.querySelector('#confirmPassword')?.value||'';if(!current||!next||!confirm){alert('Please fill all password fields.');return}if(next.length<6){alert('New password must be at least 6 characters.');return}if(next!==confirm){alert('New password and confirmation do not match.');return}if(current===next){alert('New password must be different from the current password.');return}try{const credential=firebase.auth.EmailAuthProvider.credential(user.email,current);await user.reauthenticateWithCredential(credential);await user.updatePassword(next);document.querySelector('#changePasswordForm')?.reset();document.querySelector('#passwordModal')?.close();alert('Password changed successfully.')}catch(e){const msg=e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'Current password is incorrect.':(LOGIN_ERROR[e.code]||e.message||'Could not change password.');alert(msg)}};
+  window.openPasswordModal=function(){if(window.dhRole!=='Admin'){alert('Only Admin can access Settings.');return}document.querySelector('#passwordModal')?.showModal()};
+  window.loadMadrasaLogo=async function(){try{const snap=await firebase.firestore().collection('settings').doc('general').get();const url=snap.exists?snap.data().logoUrl:'';document.querySelectorAll('[data-madrasa-logo]').forEach(img=>{if(url){img.src=url;img.style.display='block'}else img.style.display='none'})}catch(e){console.warn('Logo load failed',e)}};
+  window.uploadMadrasaLogo=async function(){if(window.dhRole!=='Admin'){alert('Only Admin can change the logo.');return}const input=document.querySelector('#madrasaLogo'),file=input?.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){alert('Please select an image file.');return}if(file.size>5*1024*1024){alert('Logo must be smaller than 5 MB.');return}const btn=document.querySelector('#logoUploadBtn');if(btn){btn.disabled=true;btn.textContent='Uploading...'}try{const ref=firebase.storage().ref('settings/madrasa-logo');await ref.put(file,{contentType:file.type,cacheControl:'public,max-age=3600'});const url=await ref.getDownloadURL();await firebase.firestore().collection('settings').doc('general').set({logoUrl:url,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:dhAuth.currentUser.uid},{merge:true});await window.loadMadrasaLogo();alert('Madrasa logo updated successfully.');input.value=''}catch(e){alert(e.message||'Logo upload failed.')}finally{if(btn){btn.disabled=false;btn.textContent='Upload Logo'}}};
+  function showPage(page){if(!can(page))page='dashboard';document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));const target=document.querySelector('#page-'+page);if(target)target.classList.remove('hidden');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));if(page==='students'&&window.renderStudents)window.renderStudents();if(page==='fees'&&window.renderFees)window.renderFees();if(page==='accounts'&&window.renderAccounts)window.renderAccounts();if(page==='reports'&&window.renderReports)window.renderReports();if(page==='dashboard'&&window.renderDashboard)window.renderDashboard();if(page==='settings'&&window.loadMadrasaLogo)window.loadMadrasaLogo();if(window.innerWidth<=900&&window.toggleMenu)window.toggleMenu(false)}
+  document.addEventListener('DOMContentLoaded',function(){const login=document.querySelector('#login'),app=document.querySelector('#app'),form=document.querySelector('#loginForm');app.classList.add('hidden');if(form)form.addEventListener('submit',function(e){e.preventDefault();e.stopImmediatePropagation();window.login()},true);document.querySelectorAll('.nav-btn[data-page]').forEach(btn=>btn.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();showPage(btn.dataset.page)},true));const username=document.querySelector('#username'),label=username?.closest('.field')?.querySelector('label');if(label)label.textContent='Email';if(username){username.type='email';username.autocomplete='email';username.placeholder='admin@example.com'}document.querySelector('#changePasswordForm')?.addEventListener('submit',function(e){e.preventDefault();window.changePassword()});document.querySelector('#logoUploadBtn')?.addEventListener('click',function(){window.uploadMadrasaLogo()});let resolved=false;try{dhAuth.onAuthStateChanged(async function(user){resolved=true;document.body.classList.add('auth-ready');if(user){await loadProfile(user);resolveAuthReady(user);login.classList.add('hidden');app.classList.remove('hidden');showPage('dashboard');const su=document.querySelector('#signedInUser');if(su)su.textContent='Signed in: '+(user.email||'')+' | Role: '+window.dhRole;if(window.loadMadrasaLogo)window.loadMadrasaLogo()}else{app.classList.add('hidden');login.classList.remove('hidden');resolveAuthReady(null);const p=document.querySelector('#password');if(p)p.value=''}})}catch(e){console.error('Firebase Auth initialization failed:',e);app.classList.add('hidden');login.classList.remove('hidden')}setTimeout(function(){if(!resolved){app.classList.add('hidden');login.classList.remove('hidden')}},5000)});
 })();
