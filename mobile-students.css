@@ -1,0 +1,33 @@
+/* Dingel Hafizia — mobile Students table */
+@media(max-width:600px){
+  .student-table-wrap{overflow:visible;background:transparent;border:0;box-shadow:none}
+  .student-table-wrap table{display:block;width:100%;min-width:0;border-collapse:separate;border-spacing:0}
+  .student-table-wrap thead{display:none}
+  .student-table-wrap tbody{display:block;width:100%}
+  .student-table-wrap tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;margin:0 0 12px;padding:8px 12px;background:#fff;border:1px solid #e3eaf0;border-radius:12px;box-shadow:0 4px 16px #17324d0b;overflow:hidden}
+  .student-table-wrap tbody tr:hover td{background:transparent}
+  .student-table-wrap tbody td{display:flex;align-items:center;gap:7px;min-width:0;padding:7px 0;border:0;white-space:normal;overflow-wrap:anywhere;font-size:13px;color:#29445b}
+  .student-table-wrap tbody td::before{font-size:10px;font-weight:800;letter-spacing:.3px;color:#82909d;flex:0 0 auto}
+  .student-table-wrap tbody td:nth-child(1)::before{content:'ID'}
+  .student-table-wrap tbody td:nth-child(2)::before{content:'STUDENT'}
+  .student-table-wrap tbody td:nth-child(3)::before{content:'GUARDIAN'}
+  .student-table-wrap tbody td:nth-child(4)::before{content:'PHONE'}
+  .student-table-wrap tbody td:nth-child(5)::before{content:'CLASS'}
+  .student-table-wrap tbody td:nth-child(6)::before{content:'TYPE'}
+  .student-table-wrap tbody td:nth-child(7)::before{content:'FEE'}
+  .student-table-wrap tbody td:nth-child(8)::before{content:'STATUS'}
+  .student-table-wrap tbody td:nth-child(9)::before{content:'ACTION'}
+  .student-table-wrap tbody td:nth-child(1),.student-table-wrap tbody td:nth-child(2){font-size:14px;font-weight:700}
+  .student-table-wrap tbody td:nth-child(2){grid-column:1/-1}
+  .student-table-wrap tbody td:nth-child(7),.student-table-wrap tbody td:nth-child(8){font-weight:600}
+  .student-table-wrap tbody td:nth-child(9){justify-content:flex-end;grid-column:1/-1;border-top:1px solid #eef2f5;margin-top:4px;padding-top:8px}
+  .student-table-wrap tbody td:nth-child(9)::before{margin-right:auto}
+  .student-table-wrap tbody td:nth-child(9) button{min-width:42px;min-height:38px;padding:7px 12px;border-radius:8px}
+  .student-table-wrap tbody td[colspan]{display:block;grid-column:1/-1;text-align:center;padding:24px 10px}
+  .student-summary{display:flex!important;flex-wrap:wrap;gap:6px 14px;line-height:1.35;margin:6px 0 10px}
+}
+@media(max-width:380px){
+  .student-table-wrap tbody tr{grid-template-columns:1fr;gap:0;padding:8px 10px}
+  .student-table-wrap tbody td:nth-child(2),.student-table-wrap tbody td:nth-child(9){grid-column:auto}
+  .student-table-wrap tbody td:nth-child(9){justify-content:flex-end}
+}
