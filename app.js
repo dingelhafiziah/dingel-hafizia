@@ -21,6 +21,14 @@
     return `DH-${String(max+1).padStart(3,'0')}`;
   }
 
+  function setStudentFeeState(){
+    const type=$('#studentType'),fee=$('#monthlyFees');
+    if(!type||!fee)return;
+    const free=['Atim','Poor-Free'].includes(type.value);
+    fee.disabled=free;
+    if(free)fee.value='0';
+  }
+
   window.toggleMenu=function(force){
     const sidebar=$('#sidebar'),overlay=$('#menuOverlay'),btn=$('#menuBtn');
     if(!sidebar||!overlay||!btn)return;
@@ -50,7 +58,8 @@
     $('#studentStatus').value='Active'; $('#studentType').value='Normal'; $('#studentClass').value='Maktab';
     $('#admissionDate').value=todayISO();
     $('#admissionDate').readOnly=true;
-    $('#monthlyFees').disabled=false; modal.showModal();
+    setStudentFeeState();
+    modal.showModal();
   };
 
   window.editStudent=function(id){
@@ -63,11 +72,12 @@
     $('#studentDob').value=s.dob||''; $('#studentAadhaar').value=s.studentAadhaar||'';
     $('#guardianName').value=s.guardianName||s.father||''; $('#guardianPhone').value=s.guardianPhone||'';
     $('#guardianAadhaar').value=s.guardianAadhaar||s.fatherAadhaar||'';
+    if($('#phone'))$('#phone').value=s.phone||'';
     $('#address').value=s.address||''; $('#studentClass').value=s.className||'Maktab';
     $('#studentType').value=s.type||s.category||'Normal'; $('#monthlyFees').value=s.monthlyFees??0;
     $('#admissionDate').value=s.admissionDate||''; $('#admissionDate').readOnly=true;
     $('#studentStatus').value=s.status||'Active';
-    $('#studentPhoto').value=''; $('#monthlyFees').disabled=['Atim','Poor-Free'].includes($('#studentType').value);
+    $('#studentPhoto').value=''; setStudentFeeState();
     modal.showModal();
   };
 
@@ -76,9 +86,7 @@
     $('#studentClassFilter')?.addEventListener('change',()=>window.renderStudents&&window.renderStudents());
     $('#studentTypeFilter')?.addEventListener('change',()=>window.renderStudents&&window.renderStudents());
     $('#studentStatusFilter')?.addEventListener('change',()=>window.renderStudents&&window.renderStudents());
-    $('#studentType')?.addEventListener('change',function(){
-      const free=['Atim','Poor-Free'].includes(this.value); $('#monthlyFees').disabled=free; if(free)$('#monthlyFees').value='0';
-    });
+    $('#studentType')?.addEventListener('change',setStudentFeeState);
     $('#studentForm')?.addEventListener('submit',function(e){e.preventDefault();window.saveStudent&&window.saveStudent(new FormData(this));});
     $('#feeSearch')?.addEventListener('input',()=>window.renderFees&&window.renderFees());
     $('#feeMonth')?.addEventListener('change',()=>window.renderFees&&window.renderFees());
