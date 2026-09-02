@@ -1,18 +1,40 @@
 <!DOCTYPE html>
 <html lang="bn">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#176b36"><title>ডিঙ্গেল হাফিজিয়া মাদ্রাসা — Management</title><link rel="stylesheet" href="style.css"></head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176b36">
+  <title>ডিঙ্গেল হাফিজিয়া মাদ্রাসা — Management</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
-<div class="app-shell">
-<header class="topbar"><div class="brand"><div class="logo-picker"><button id="logo-button" class="brand-mark" type="button" aria-label="মাদ্রাসার Logo পরিবর্তন"><span id="logo-placeholder">⌂</span></button><div id="logo-menu" class="logo-menu"><button type="button" id="add-logo">＋ Add Logo</button><button type="button" id="remove-logo">× Delete Logo</button></div><input id="logo-input" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></div><div><h1>ডিঙ্গেল হাফিজিয়া মাদ্রাসা</h1><p>Dingel Hafizia Madrasa · Student & Accounts Management</p></div></div><div class="header-meta"><span>স্থাপিত — ২০১৭</span><span>Govt Regd — IV/120/600051</span></div></header>
-<aside class="sidebar"><nav aria-label="প্রধান নেভিগেশন"><button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button><button class="nav-item" data-page="students">👨‍🎓 <span>Students</span></button><button class="nav-item" data-page="fees">৳ <span>Fees Management</span></button><button class="nav-item" data-page="income">＋ <span>Madrasa Income</span></button><button class="nav-item" data-page="expense">− <span>Madrasa Expense</span></button></nav><div class="sidebar-note">Local / Offline Data<br><small>Firebase বর্তমানে ব্যবহার করা হচ্ছে না</small></div></aside>
-<main class="main-content">
-<section id="dashboard" class="page active-page"><div class="page-heading"><div><h2>Dashboard</h2><p>এই অংশটি ইচ্ছাকৃতভাবে খালি রাখা হয়েছে।</p></div></div><div class="empty-dashboard"><div class="empty-icon">✦</div><h3>Dashboard Reserved</h3><p>পরবর্তীতে এখানে প্রয়োজনীয় সারাংশ ও রিপোর্ট যোগ করা হবে।</p></div></section>
-<section id="students" class="page"><div class="page-heading"><div><h2>Students Management</h2><p>ছাত্র ভর্তি, তথ্য, অনুসন্ধান, Edit ও Delete</p></div><button class="primary-btn" data-action="open-student">+ Add Student</button></div><div class="stats-row"><div class="mini-stat"><b id="student-total">0</b><span>Total Students</span></div><div class="mini-stat"><b id="student-general">0</b><span>General</span></div><div class="mini-stat"><b id="student-orphan">0</b><span>Orphan / এতিম</span></div></div><div class="card"><div class="table-toolbar"><input id="student-search" type="search" placeholder="নাম / ID / মোবাইল / শ্রেণি দিয়ে খুঁজুন..."><span id="student-count">0 Students</span></div><div class="table-wrap"><table><thead><tr><th>Student ID</th><th>নাম</th><th>শ্রেণি</th><th>অভিভাবক</th><th>মোবাইল</th><th>ধরন</th><th>Action</th></tr></thead><tbody id="student-table"></tbody></table></div></div></section>
-<section id="fees" class="page"><div class="page-heading"><div><h2>Fees Management</h2><p>মাসিক ফি, Paid ও Due</p></div><button class="primary-btn" data-action="add-fee">+ Add Fee</button></div><div class="card"><div class="table-toolbar"><input id="fee-search" type="search" placeholder="Student ID / নাম দিয়ে খুঁজুন..."><span id="fee-count">0 Records</span></div><div class="table-wrap"><table><thead><tr><th>Student</th><th>Month</th><th>Fee</th><th>Paid</th><th>Due</th><th>Status</th></tr></thead><tbody id="fee-table"></tbody></table></div></div></section>
-<section id="income" class="page"><div class="page-heading"><div><h2>Madrasa Income</h2><p>মাদ্রাসার সকল আয়</p></div><button class="primary-btn" data-action="add-income">+ Add Income</button></div><div class="card"><div class="table-toolbar"><input id="income-search" type="search" placeholder="আয়ের খাত দিয়ে খুঁজুন..."><span id="income-total">Total: ₹0</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>খাত</th><th>বিবরণ</th><th>Amount</th></tr></thead><tbody id="income-table"></tbody></table></div></div></section>
-<section id="expense" class="page"><div class="page-heading"><div><h2>Madrasa Expense</h2><p>মাদ্রাসার সকল ব্যয়</p></div><button class="primary-btn" data-action="add-expense">+ Add Expense</button></div><div class="card"><div class="table-toolbar"><input id="expense-search" type="search" placeholder="ব্যয়ের খাত দিয়ে খুঁজুন..."><span id="expense-total">Total: ₹0</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>খাত</th><th>বিবরণ</th><th>Amount</th></tr></thead><tbody id="expense-table"></tbody></table></div></div></section>
-</main>
-<footer class="footer"><div>পরিচালনায় — ডিঙ্গেল ইসমাইল ওয়েলফেয়ার ট্রাস্ট</div><div>গ্রাম+পোস্ট — ডিঙ্গেল, থানা — কালীগঞ্জ, জেলা — নদীয়া, পিন — ৭৪১১৩৭</div><div>যোগাযোগ — ৭৫৮৬০৭৭৮৩০ / ৮৫৯৭৭৪৬১৮২</div></footer>
-</div>
-<div id="student-modal" class="modal" aria-hidden="true"><div class="modal-card"><div class="modal-head"><div><h3 id="student-modal-title">Add Student</h3><p>ছাত্রের সম্পূর্ণ মৌলিক তথ্য দিন</p></div><button class="icon-btn" data-action="close-student">×</button></div><form id="student-form"><input type="hidden" id="student-edit-id"><div class="form-grid"><label>Student ID<input id="form-id" required></label><label>ছাত্রের নাম<input id="form-name" required></label><label>শ্রেণি<input id="form-class" required placeholder="যেমন: হিফজ / নাজেরা"></label><label>অভিভাবকের নাম<input id="form-guardian"></label><label>মোবাইল নম্বর<input id="form-phone" inputmode="tel"></label><label>ধরন<select id="form-type"><option>General</option><option>Orphan</option></select></label><label>ভর্তি তারিখ<input id="form-admission" type="date"></label><label>ঠিকানা<input id="form-address"></label></div><div class="modal-actions"><button type="button" class="secondary-btn" data-action="close-student">Cancel</button><button type="submit" class="primary-btn">Save Student</button></div></form></div></div>
-<script src="app.js"></script></body></html>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">DH</div>
+        <div><h1>ডিঙ্গেল হাফিজিয়া মাদ্রাসা</h1><p>Dingel Hafizia Madrasa</p></div>
+      </div>
+      <div class="header-meta"><span>স্থাপিত — ২০১৭</span><span>Govt Regd — IV/120/600051</span></div>
+    </header>
+    <aside class="sidebar">
+      <nav aria-label="প্রধান নেভিগেশন">
+        <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-page="students">👨‍🎓 <span>Students</span></button>
+        <button class="nav-item" data-page="fees">৳ <span>Fees Management</span></button>
+        <button class="nav-item" data-page="income">＋ <span>Madrasa Income</span></button>
+        <button class="nav-item" data-page="expense">− <span>Madrasa Expense</span></button>
+      </nav>
+      <div class="sidebar-note">Firebase ছাড়া Local System<br><small>Future Firebase-ready</small></div>
+    </aside>
+    <main class="main-content">
+      <section id="dashboard" class="page active-page"><div class="page-heading"><div><h2>Dashboard</h2><p>ড্যাশবোর্ডের অংশটি এখন খালি রাখা হয়েছে।</p></div></div><div class="empty-dashboard"><div class="empty-icon">✦</div><h3>Dashboard</h3><p>এখানে পরবর্তীতে প্রয়োজনীয় হিসাব ও সারাংশ যোগ করা হবে।</p></div></section>
+      <section id="students" class="page"><div class="page-heading"><div><h2>Students</h2><p>ছাত্রদের তথ্য ব্যবস্থাপনা</p></div><button class="primary-btn" data-action="add-student">+ Add Student</button></div><div class="card"><div class="table-toolbar"><input id="student-search" type="search" placeholder="নাম / ID / মোবাইল দিয়ে খুঁজুন..."><span id="student-count">0 Students</span></div><div class="table-wrap"><table><thead><tr><th>Student ID</th><th>নাম</th><th>শ্রেণি</th><th>অভিভাবক</th><th>মোবাইল</th><th>ধরন</th></tr></thead><tbody id="student-table"></tbody></table></div></div></section>
+      <section id="fees" class="page"><div class="page-heading"><div><h2>Fees Management</h2><p>ছাত্রদের মাসিক ফি, Paid ও Due</p></div><button class="primary-btn" data-action="add-fee">+ Add Fee</button></div><div class="card"><div class="table-toolbar"><input id="fee-search" type="search" placeholder="Student ID / নাম দিয়ে খুঁজুন..."><span id="fee-count">0 Records</span></div><div class="table-wrap"><table><thead><tr><th>Student</th><th>Month</th><th>Fee</th><th>Paid</th><th>Due</th><th>Status</th></tr></thead><tbody id="fee-table"></tbody></table></div></div></section>
+      <section id="income" class="page"><div class="page-heading"><div><h2>Madrasa Income</h2><p>মাদ্রাসার সকল আয় এক জায়গায়</p></div><button class="primary-btn" data-action="add-income">+ Add Income</button></div><div class="card"><div class="table-toolbar"><input id="income-search" type="search" placeholder="আয়ের খাত দিয়ে খুঁজুন..."><span id="income-total">Total: ₹0</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>খাত</th><th>বিবরণ</th><th>Amount</th></tr></thead><tbody id="income-table"></tbody></table></div></div></section>
+      <section id="expense" class="page"><div class="page-heading"><div><h2>Madrasa Expense</h2><p>মাদ্রাসার সকল ব্যয় এক জায়গায়</p></div><button class="primary-btn" data-action="add-expense">+ Add Expense</button></div><div class="card"><div class="table-toolbar"><input id="expense-search" type="search" placeholder="ব্যয়ের খাত দিয়ে খুঁজুন..."><span id="expense-total">Total: ₹0</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>খাত</th><th>বিবরণ</th><th>Amount</th></tr></thead><tbody id="expense-table"></tbody></table></div></div></section>
+    </main>
+    <footer class="footer"><div>পরিচালনায় — ডিঙ্গেল ইসমাইল ওয়েলফেয়ার ট্রাস্ট</div><div>গ্রাম+পোস্ট — ডিঙ্গেল, থানা — কালীগঞ্জ, জেলা — নদীয়া, পিন — ৭৪১১৩৭</div><div>যোগাযোগ — ৭৫৮৬০৭৭৮৩০ / ৮৫৯৭৭৪৬১৮২</div></footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
