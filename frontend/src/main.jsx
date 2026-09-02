@@ -1,0 +1,17 @@
+import React,{useEffect,useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import './styles.css';
+const API='http://localhost:5000/api';
+function App(){
+ const [summary,setSummary]=useState({totalIncome:0,totalExpense:0,balance:0}); const [students,setStudents]=useState([]); const [message,setMessage]=useState('');
+ const [form,setForm]=useState({type:'INCOME',category:'Donation',amount:'',donorName:'',description:''});
+ const load=async()=>{try{const [s,t]=await Promise.all([fetch(API+'/transactions/summary'),fetch(API+'/students/list')]);setSummary(await s.json());setStudents(await t.json());}catch(e){setMessage('Backend চালু আছে কি না যাচাই করুন।')}};
+ useEffect(()=>{load()},[]);
+ const submit=async e=>{e.preventDefault();setMessage('');try{const r=await fetch(API+'/transactions/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});if(!r.ok)throw new Error();setForm({type:'INCOME',category:'Donation',amount:'',donorName:'',description:''});setMessage('লেনদেন সফলভাবে সংরক্ষণ হয়েছে।');load();}catch{setMessage('সংরক্ষণ করা যায়নি। Backend/MongoDB যাচাই করুন.')}};
+ return <main><header><h1>ডিঙ্গেল হাফিজিয়া মাদ্রাসা</h1><p><b>পরিচালনায়:</b> ডিঙ্গেল ইসমাইল ওয়েলফেয়ার ট্রাস্ট (Govt Regd: IV/120/600051)</p><p>গ্রাম+পোস্ট-ডিঙ্গেল, থানা-কালীগঞ্জ, জেলা-নদীয়া, পিন-৭৪১১৩৭</p><p>মোবাইল: ৯৫৮৬০৭৭৮৩০ / ৮৫৯৭৭৪৬৯৮২</p></header>
+ <section className="cards"><div><span>মোট আয়</span><strong>₹ {summary.totalIncome}</strong></div><div><span>মোট ব্যয়</span><strong>₹ {summary.totalExpense}</strong></div><div><span>অবশিষ্ট ফান্ড</span><strong>₹ {summary.balance}</strong></div></section>
+ <div className="warning"><b>বিশেষ সতর্কবার্তা:</b> কোনো বাচ্চা ছেলের মাধ্যমে দান তোলা নিষেধ। দান করার আগে সংগ্রাহকের পরিচয়পত্র ও মাদ্রাসার অফিসিয়াল রসিদ যাচাই করে নিন।</div>
+ <section className="panel"><h2>নতুন লেনদেন / Add Transaction</h2><form onSubmit={submit}><div className="row"><select value={form.type} onChange={e=>setForm({...form,type:e.target.value})}><option value="INCOME">আয় (Income)</option><option value="EXPENSE">ব্যয় (Expense)</option></select><select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}><option>Donation</option><option>Student Fee</option><option>Salary</option><option>Food</option><option>Utility</option><option>Construction</option><option>Other</option></select></div><input required type="number" min="0" placeholder="টাকার পরিমাণ (₹)" value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})}/><input placeholder="দাতা / গ্রহণকারীর নাম" value={form.donorName} onChange={e=>setForm({...form,donorName:e.target.value})}/><textarea placeholder="বিবরণ / নোট" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/><button>সেভ করুন (Save Record)</button></form>{message&&<p className="message">{message}</p>}</section>
+ <section className="panel"><h2>ছাত্র-ছাত্রী: {students.length} জন</h2><div className="tablewrap"><table><thead><tr><th>রোল</th><th>নাম</th><th>শ্রেণি/ক্যাটাগরি</th><th>অভিভাবক</th></tr></thead><tbody>{students.map(s=><tr key={s._id}><td>{s.rollNo}</td><td>{s.name}</td><td>{s.category}</td><td>{s.guardianName||'-'}</td></tr>)}</tbody></table></div></section>
+ </main>}
+createRoot(document.getElementById('root')).render(<App/>);
