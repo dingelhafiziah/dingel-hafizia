@@ -1,4 +1,4 @@
-/* Final entry spacing override — compact, light and clean */
+/* Final entry spacing + Income/Expense page layout */
 .entry-modal{margin:0!important;width:100%!important;max-width:100%!important}
 .entry-hero{padding:14px 16px!important;gap:10px!important}
 .entry-icon{width:40px!important;height:40px!important;border-radius:12px!important;font-size:22px!important}
@@ -10,5 +10,38 @@
 .entry-input{min-height:40px!important;height:40px!important;padding:8px 10px!important;border:1.5px solid #cfd8dd!important;border-radius:9px!important;background:#fff!important;box-shadow:none!important}
 .amount-input{font-size:16px!important;padding-left:30px!important}.amount-wrap>span{left:11px!important;top:10px!important;font-size:16px!important}.entry-note{height:68px!important;min-height:68px!important}.entry-hint{font-size:8px!important}
 .entry-footer{gap:8px!important;margin-top:12px!important}.entry-cancel,.entry-save{min-height:41px!important;height:41px!important;border-radius:10px!important;font-size:12px!important}
-@media(max-width:760px){.entry-modal{margin:0!important}.entry-hero{padding:13px 14px!important}.entry-modal form{padding:11px 14px 13px!important}.entry-section{padding:11px 0 13px!important}.entry-grid{grid-template-columns:1fr!important;gap:9px!important}.entry-input{min-height:39px!important;height:39px!important;border-radius:9px!important}.entry-note{height:64px!important;min-height:64px!important}.entry-footer{grid-template-columns:1fr 1.25fr!important;margin-top:11px!important}.entry-cancel,.entry-save{min-height:40px!important;height:40px!important}}
-@media(max-width:390px){.entry-hero{padding:12px!important}.entry-modal form{padding:10px 12px 12px!important}.entry-section{padding:10px 0 12px!important}.entry-input{min-height:38px!important;height:38px!important}.entry-note{height:60px!important;min-height:60px!important}}
+
+/* Income / Expenses page: actions first, then compact financial summary */
+#content:has(.summary-grid){display:flex!important;flex-direction:column!important;gap:0!important}
+#content:has(.summary-grid)>.page-head{order:1!important}
+#content:has(.summary-grid)>.card:not(.table-card){order:2!important}
+#content:has(.summary-grid)>.summary-grid{order:3!important}
+#content:has(.summary-grid)>.toolbar{order:4!important}
+#content:has(.summary-grid)>.table-card{order:5!important}
+#content:has(.summary-grid)>.summary-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;margin:0 0 16px!important}
+#content:has(.summary-grid)>.summary-grid>.summary-card{min-height:112px!important;padding:16px 17px!important;border:1px solid #e3e8eb!important;border-top-width:3px!important;border-radius:18px!important;box-shadow:0 5px 18px rgba(20,40,35,.05)!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
+#content:has(.summary-grid)>.summary-grid .stat-label{font-size:12px!important;font-weight:700!important;opacity:.62!important}
+#content:has(.summary-grid)>.summary-grid .big{font-size:26px!important;line-height:1!important;font-weight:800!important;letter-spacing:-.6px!important}
+#content:has(.summary-grid)>.summary-grid>.summary-card:first-child{background:linear-gradient(145deg,#f5fcf8,#fff)!important}
+#content:has(.summary-grid)>.summary-grid>.summary-card:nth-child(2){background:linear-gradient(145deg,#fff7f8,#fff)!important}
+#content:has(.summary-grid)>.summary-grid>.summary-card:nth-child(3){background:linear-gradient(145deg,#f5f9ff,#fff)!important}
+#content:has(.summary-grid)>.card:not(.table-card){padding:16px 18px!important;margin:0 0 14px!important;border:1px solid #e3e8eb!important;border-radius:18px!important;box-shadow:0 5px 18px rgba(20,40,35,.045)!important}
+#content:has(.summary-grid)>.card:not(.table-card)>div{gap:8px!important}
+#content:has(.summary-grid)>.card:not(.table-card) strong{font-size:15px!important}
+#content:has(.summary-grid)>.card:not(.table-card) button{min-height:40px!important;height:40px!important;border-radius:11px!important;padding:0 16px!important;font-size:12px!important;font-weight:800!important}
+
+@media(max-width:760px){
+  .entry-modal{margin:0!important}.entry-hero{padding:13px 14px!important}.entry-modal form{padding:11px 14px 13px!important}.entry-section{padding:11px 0 13px!important}.entry-grid{grid-template-columns:1fr!important;gap:9px!important}.entry-input{min-height:39px!important;height:39px!important;border-radius:9px!important}.entry-note{height:64px!important;min-height:64px!important}.entry-footer{grid-template-columns:1fr 1.25fr!important;margin-top:11px!important}.entry-cancel,.entry-save{min-height:40px!important;height:40px!important}
+  #content:has(.summary-grid)>.summary-grid{grid-template-columns:1fr!important;gap:9px!important;margin-bottom:14px!important}
+  #content:has(.summary-grid)>.summary-grid>.summary-card{min-height:82px!important;height:82px!important;padding:13px 15px!important;border-radius:16px!important}
+  #content:has(.summary-grid)>.summary-grid .stat-label{font-size:11px!important}
+  #content:has(.summary-grid)>.summary-grid .big{font-size:24px!important}
+  #content:has(.summary-grid)>.card:not(.table-card){padding:14px 15px!important;margin-bottom:12px!important;border-radius:16px!important}
+  #content:has(.summary-grid)>.card:not(.table-card)>div{align-items:flex-start!important}
+  #content:has(.summary-grid)>.card:not(.table-card) button{min-height:38px!important;height:38px!important;padding:0 14px!important}
+}
+@media(max-width:390px){
+  .entry-hero{padding:12px!important}.entry-modal form{padding:10px 12px 12px!important}.entry-section{padding:10px 0 12px!important}.entry-input{min-height:38px!important;height:38px!important}.entry-note{height:60px!important;min-height:60px!important}
+  #content:has(.summary-grid)>.summary-grid>.summary-card{height:76px!important;min-height:76px!important;padding:11px 13px!important}
+  #content:has(.summary-grid)>.summary-grid .big{font-size:22px!important}
+}
