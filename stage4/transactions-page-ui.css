@@ -1,5 +1,5 @@
-/* Income / Expenses page — clean compact dashboard UI */
-.tx-page{display:flex;flex-direction:column;gap:12px}
+/* Income / Expenses page — preserve upper UI, compact filters */
+.tx-page{display:flex;flex-direction:column;gap:8px}
 .tx-page .tx-add{order:1;background:linear-gradient(135deg,#f3fbf7,#fff);border:1px solid #dce9e3;border-radius:18px;padding:16px 18px;box-shadow:0 6px 20px rgba(30,70,60,.06)}
 .tx-page .tx-total{order:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .tx-page .tx-tools{order:3}.tx-page .tx-list{order:4}
@@ -8,11 +8,11 @@
 .tx-page .tx-total .big{font-size:28px!important;line-height:1;font-weight:800}
 .tx-page .tx-add-title{font-size:16px;font-weight:800}.tx-page .tx-add-sub{font-size:11px;opacity:.6;margin-top:3px}
 .tx-page .tx-add-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tx-page .tx-add-actions .btn{min-height:40px;border-radius:11px;padding:8px 15px;font-size:12px;font-weight:800}
-.tx-page .tx-tools{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:9px}.tx-page .tx-tools .input,.tx-page .tx-tools .select{height:38px;min-height:38px;border:1px solid #d9e0e4;border-radius:10px;background:#fff;padding:7px 10px;font-size:11px}
-.tx-page .tx-list{overflow:hidden;border:1px solid #e4e9ec;border-radius:16px;box-shadow:0 5px 18px rgba(25,35,45,.04)}
-/* Mobile: compact filter row so Transaction Details starts higher */
+.tx-page .tx-tools{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:7px;align-items:center;margin:0!important}
+.tx-page .tx-tools .input,.tx-page .tx-tools .select{height:34px;min-height:34px;border:1px solid #d9e0e4;border-radius:9px;background:#fff;padding:6px 8px;font-size:10px}
+.tx-page .tx-list{overflow:hidden;border:1px solid #e4e9ec;border-radius:16px;box-shadow:0 5px 18px rgba(25,35,45,.04);margin-top:0!important}
 @media(max-width:760px){
- .tx-page{gap:5px}
+ .tx-page{gap:4px}
  .tx-page .tx-add{padding:14px;border-radius:16px}
  .tx-page .tx-total{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
  .tx-page .tx-total .summary-card{min-height:88px;padding:12px 10px;border-radius:13px!important}
@@ -20,22 +20,22 @@
  .tx-page .tx-total .big{font-size:21px!important}
  .tx-page .tx-add-title{font-size:14px}.tx-page .tx-add-sub{font-size:10px}
  .tx-page .tx-add-actions{margin-top:7px;gap:7px}.tx-page .tx-add-actions .btn{min-height:38px;padding:7px 11px;font-size:11px}
- .tx-page .tx-tools{grid-template-columns:1.5fr 1fr 1fr;gap:3px;align-items:center;margin:0!important;padding:0!important}
- .tx-page .tx-tools .tool-search,.tx-page .tx-tools .tool-select,.tx-page .tx-tools .tool-date{min-width:0;margin:0!important}
+ .tx-page .tx-tools{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(82px,.9fr)!important;gap:3px!important;margin:0!important;padding:0!important}
+ .tx-page .tx-tools .tool-search,.tx-page .tx-tools .tool-select,.tx-page .tx-tools .tool-date{min-width:0;margin:0!important;height:30px!important}
  .tx-page .tx-tools .input,.tx-page .tx-tools .select{width:100%;height:30px;min-height:30px;padding:4px 5px;font-size:8px;border-radius:7px}
  .tx-page .tx-tools .tool-search span,.tx-page .tx-tools .tool-select span,.tx-page .tx-tools .tool-date span{font-size:9px}
- .tx-page .tx-tools .tool-date em{font-size:8px;white-space:nowrap}
- .tx-page .tx-list{margin-top:1px!important;min-height:500px!important}
+ .tx-page .tx-tools .tool-date em{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .tx-page .tx-list{margin-top:0!important;min-height:500px!important}
  .tx-page .tx-list .tx-list-head{padding:12px 12px!important}
  .tx-page .tx-list .tx-list-head strong{font-size:15px!important}
  .tx-page .tx-list .tx-list-head small{font-size:9px!important}
 }
 @media(max-width:390px){
- .tx-page{gap:4px}
+ .tx-page{gap:3px}
  .tx-page .tx-total .summary-card{min-height:82px;padding:10px 8px}
  .tx-page .tx-total .stat-label{font-size:8px}.tx-page .tx-total .big{font-size:19px!important}
  .tx-page .tx-add-actions .btn{font-size:10px;padding:7px 9px}
- .tx-page .tx-tools{grid-template-columns:1.5fr 1fr 1fr;gap:2px}
+ .tx-page .tx-tools{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(76px,.9fr)!important;gap:2px!important}
  .tx-page .tx-tools .input,.tx-page .tx-tools .select{height:29px;min-height:29px;padding:4px;font-size:7.5px}
  .tx-page .tx-tools .tool-date em{font-size:7.5px}
  .tx-page .tx-list{min-height:520px!important}
