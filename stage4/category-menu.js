@@ -1,0 +1,16 @@
+/* Dingel Hafizia App — Income/Expense Categories Menu */
+(function(){
+  const KEY="dh_transaction_categories";
+  const defaults={Income:["Normal","Zakat","Fitra"],Expense:["Normal"]};
+  const load=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||"null");return {Income:Array.isArray(v?.Income)&&v.Income.length?v.Income:defaults.Income.slice(),Expense:Array.isArray(v?.Expense)&&v.Expense.length?v.Expense:defaults.Expense.slice()};}catch(e){return {Income:defaults.Income.slice(),Expense:defaults.Expense.slice()};}};
+  const save=v=>localStorage.setItem(KEY,JSON.stringify(v));
+  const access=()=>typeof canAccess!=="function"||canAccess("transactions");
+  window.renderCategories=function(){
+    if(!access()){content.innerHTML='<div class="card empty"><strong>Access denied</strong><span>You do not have permission to manage categories.</span></div>';return;}
+    const cats=load();
+    const list=type=>cats[type].map((c,i)=>`<div class="card" style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px"><div><strong>${esc(c)}</strong><div style="font-size:12px;opacity:.58;margin-top:3px">${type} category</div></div><button class="table-action danger" onclick="deleteMenuCategory('${type}',${i})">Delete</button></div>`).join("");
+    content.innerHTML=`<div class="page-head"><div><h2>Categories</h2><p>Manage categories used for Income and Expenses.</p></div></div><div class="summary-grid"><div class="card summary-card"><div class="stat-label">Income Categories</div><div class="big">${cats.Income.length}</div></div><div class="card summary-card"><div class="stat-label">Expense Categories</div><div class="big">${cats.Expense.length}</div></div></div><div class="grid" style="align-items:start"><div><div class="card" style="padding:18px;margin-bottom:12px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h3 style="margin:0">Income</h3><button class="btn btn-primary" onclick="addMenuCategory('Income')">＋ Add</button></div></div>${list("Income")}</div><div><div class="card" style="padding:18px;margin-bottom:12px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h3 style="margin:0">Expense</h3><button class="btn btn-primary" onclick="addMenuCategory('Expense')">＋ Add</button></div></div>${list("Expense")}</div></div>`;
+  };
+  window.addMenuCategory=function(type){if(!access())return;const name=prompt(`Enter new ${type.toLowerCase()} category:`);if(!name||!name.trim())return;const cats=load(),clean=name.trim();if(cats[type].includes(clean))return alert("Category already exists.");cats[type].push(clean);save(cats);renderCategories();};
+  window.deleteMenuCategory=function(type,index){if(!access())return;const cats=load(),name=cats[type][index];if(!name)return;if(cats[type].length<=1)return alert("At least one category must remain.");if(!confirm(`Delete category "${name}"? Existing transactions will not be deleted.`))return;cats[type].splice(index,1);save(cats);renderCategories();};
+})();
