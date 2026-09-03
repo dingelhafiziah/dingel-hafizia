@@ -1,0 +1,23 @@
+/* Income / Expense Entry — polished responsive UI */
+.modal{border-radius:24px!important;padding:0!important;overflow:auto!important;background:#fff!important;box-shadow:0 28px 90px rgba(16,47,39,.25)!important}
+.modal form{padding:0 24px 24px}
+.modal form>div:first-child{padding-top:0!important}
+.modal form>div:first-child>div:first-child{margin:0 -24px 22px!important;padding:22px 24px 18px!important;border-bottom:1px solid #e8eee9!important;background:linear-gradient(135deg,#eef8f3,#fff)!important;border-radius:24px 24px 0 0}
+.modal form>div:first-child>div:first-child>div:first-child{width:50px!important;height:50px!important;border-radius:16px!important;box-shadow:0 8px 20px rgba(23,107,85,.14)!important}
+.modal form>div:first-child>div:first-child>div:nth-child(2)>div:first-child{font-size:23px!important;font-weight:800!important;letter-spacing:-.3px}
+.modal form>div:first-child>div:first-child>div:nth-child(2)>div:last-child{font-size:11px!important;color:#7b8492!important;opacity:1!important}
+.modal form>div:first-child>div:first-child .close{width:36px!important;height:36px!important;border-radius:11px!important;background:#f3f5f6!important;font-size:22px!important}
+.modal form>div:first-child>div:nth-child(2){display:grid!important;grid-template-columns:1fr 1fr!important;gap:16px!important}
+.modal form>div:first-child>div:nth-child(2)>.field{padding:0!important;gap:7px!important}
+.modal form>div:first-child>div:nth-child(2)>.field:nth-child(5){grid-column:1/-1}
+.modal form .field label{font-size:10px!important;text-transform:uppercase!important;letter-spacing:.5px!important;color:#667085!important;font-weight:800!important}
+.modal form .field .input,.modal form .field .select{min-height:50px!important;border-radius:13px!important;border:1px solid #dfe5e9!important;background:#fbfcfd!important;padding:12px 14px!important;color:#172033!important}
+.modal form .field .input:focus,.modal form .field .select:focus{background:#fff!important;border-color:#176b55!important;box-shadow:0 0 0 4px rgba(23,107,85,.08)!important}
+.modal form .field:nth-child(4) .input{font-size:21px!important;font-weight:800!important}
+.modal form .field:nth-child(5) textarea{min-height:100px!important;line-height:1.55!important;resize:vertical!important}
+.modal form .field small{font-size:9px!important;color:#8b95a4!important;opacity:1!important}
+.modal form>div:first-child>div:nth-child(3){margin-top:20px!important;padding:13px 15px!important;border-radius:13px!important;border:1px solid #e7ecef!important}
+.modal form .modal-actions{display:grid!important;grid-template-columns:1fr 1.35fr!important;gap:10px!important;margin:18px -24px -24px!important;padding:16px 24px 24px!important;border-top:1px solid #edf0f2!important;background:#fafbfc!important}
+.modal form .modal-actions .btn{min-height:50px!important;border-radius:13px!important;font-size:13px!important;font-weight:800!important}
+@media(max-width:760px){.modal{width:100%!important;max-height:94vh!important;border-radius:22px 22px 0 0!important}.modal form{padding:0 18px 18px}.modal form>div:first-child>div:first-child{margin:0 -18px 20px!important;padding:19px 18px 16px!important;border-radius:22px 22px 0 0!important}.modal form>div:first-child>div:nth-child(2){grid-template-columns:1fr!important;gap:13px!important}.modal form>div:first-child>div:nth-child(2)>.field:nth-child(5){grid-column:auto}.modal form .modal-actions{grid-template-columns:1fr 1.35fr!important;margin:18px -18px -18px!important;padding:14px 18px 18px!important}.modal form>div:first-child>div:nth-child(3){margin-top:16px!important}}
+@media(max-width:390px){.modal form .modal-actions{grid-template-columns:1fr!important}.modal form>div:first-child>div:nth-child(2){gap:11px!important}}
