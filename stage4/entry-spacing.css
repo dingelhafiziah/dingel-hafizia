@@ -1,32 +1,14 @@
-/* Dingel Hafizia App — Income/Expense Entry: compact bordered layout */
-.entry-modal{margin:-23px!important}
-.entry-hero{padding:18px 20px 16px!important;gap:12px!important;border-bottom:1px solid #e5ebe8!important}
-.entry-icon{width:44px!important;height:44px!important;border-radius:13px!important;font-size:24px!important}
-.entry-title-wrap h3{font-size:20px!important;margin-bottom:2px!important}
-.entry-title-wrap p{font-size:10px!important}
-.entry-close{width:32px!important;height:32px!important}
-.entry-modal form{padding:16px 20px 18px!important}
-.entry-section{padding-bottom:15px!important;margin-bottom:14px!important}
-.entry-section-title{gap:9px!important;margin-bottom:10px!important}
-.entry-section-title>span{width:26px!important;height:26px!important;border-radius:8px!important}
-.entry-section-title strong{font-size:12px!important}
-.entry-section-title small{font-size:9px!important;margin-top:1px!important}
-.entry-grid{gap:10px!important}
-.entry-field{gap:5px!important}
-.entry-field label{font-size:9px!important}
-.entry-input{min-height:42px!important;padding:9px 11px!important;border:1.5px solid #d7dfe2!important;border-radius:11px!important;background:#fff!important}
-.amount-input{font-size:17px!important;padding-left:32px!important}
-.amount-wrap>span{left:13px!important;top:11px!important;font-size:17px!important}
-.entry-note{min-height:76px!important}
-.entry-hint{font-size:8px!important}
-.entry-footer{gap:8px!important;margin-top:15px!important}
-.entry-cancel,.entry-save{min-height:44px!important;border-radius:11px!important}
-@media(max-width:760px){
-  .entry-modal{margin:-18px!important}
-  .entry-hero{padding:15px 17px 14px!important}
-  .entry-modal form{padding:14px 17px 16px!important}
-  .entry-grid{grid-template-columns:1fr!important;gap:10px!important}
-  .entry-section{padding-bottom:13px!important;margin-bottom:12px!important}
-  .entry-input{min-height:44px!important}
-  .entry-footer{grid-template-columns:1fr 1.35fr!important}
-}
+/* Final entry spacing override — compact, light and clean */
+.entry-modal{margin:0!important;width:100%!important;max-width:100%!important}
+.entry-hero{padding:14px 16px!important;gap:10px!important}
+.entry-icon{width:40px!important;height:40px!important;border-radius:12px!important;font-size:22px!important}
+.entry-title-wrap h3{font-size:19px!important;margin:0 0 2px!important}.entry-title-wrap p{font-size:9px!important}.entry-close{width:32px!important;height:32px!important}
+.entry-modal form{padding:12px 16px 14px!important}
+.entry-section{padding:12px 0 14px!important;margin:0!important;border-bottom:1px solid #edf0f1!important}
+.entry-section-title{gap:8px!important;margin-bottom:9px!important}.entry-section-title>span{width:24px!important;height:24px!important;border-radius:7px!important}.entry-section-title strong{font-size:12px!important}.entry-section-title small{font-size:9px!important}
+.entry-grid{gap:10px!important}.entry-field{gap:5px!important}.entry-field label{font-size:9px!important}
+.entry-input{min-height:40px!important;height:40px!important;padding:8px 10px!important;border:1.5px solid #cfd8dd!important;border-radius:9px!important;background:#fff!important;box-shadow:none!important}
+.amount-input{font-size:16px!important;padding-left:30px!important}.amount-wrap>span{left:11px!important;top:10px!important;font-size:16px!important}.entry-note{height:68px!important;min-height:68px!important}.entry-hint{font-size:8px!important}
+.entry-footer{gap:8px!important;margin-top:12px!important}.entry-cancel,.entry-save{min-height:41px!important;height:41px!important;border-radius:10px!important;font-size:12px!important}
+@media(max-width:760px){.entry-modal{margin:0!important}.entry-hero{padding:13px 14px!important}.entry-modal form{padding:11px 14px 13px!important}.entry-section{padding:11px 0 13px!important}.entry-grid{grid-template-columns:1fr!important;gap:9px!important}.entry-input{min-height:39px!important;height:39px!important;border-radius:9px!important}.entry-note{height:64px!important;min-height:64px!important}.entry-footer{grid-template-columns:1fr 1.25fr!important;margin-top:11px!important}.entry-cancel,.entry-save{min-height:40px!important;height:40px!important}}
+@media(max-width:390px){.entry-hero{padding:12px!important}.entry-modal form{padding:10px 12px 12px!important}.entry-section{padding:10px 0 12px!important}.entry-input{min-height:38px!important;height:38px!important}.entry-note{height:60px!important;min-height:60px!important}}
