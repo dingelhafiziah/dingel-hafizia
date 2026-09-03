@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - 'stage1/**'
+      - 'stage4/income-expenses.js'
       - '.github/workflows/stage1-check.yml'
   pull_request:
     paths:
       - 'stage1/**'
+      - 'stage4/income-expenses.js'
       - '.github/workflows/stage1-check.yml'
 
 jobs:
@@ -17,6 +19,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Check JavaScript syntax
-        run: node --check stage1/js/app.js
-      - name: Verify Stage 1 files
-        run: test -f stage1/index.html && test -f stage1/css/style.css && test -f stage1/js/app.js
+        run: |
+          node --check stage1/js/app.js
+          node --check stage4/income-expenses.js
+      - name: Verify required files
+        run: |
+          test -f stage1/index.html
+          test -f stage1/css/style.css
+          test -f stage1/js/app.js
+          test -f stage4/income-expenses.js
