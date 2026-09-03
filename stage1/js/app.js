@@ -1,4 +1,4 @@
-const safeLoad=(key,fallback=[])=>{try{const v=JSON.parse(localStorage.getItem(key)||'null');return Array.isArray(v)?v:fallback}catch(e){return fallback}};
+const safeLoad=(key,fallback=[])=>{try{const v=JSON.parse(localStorage.getItem(key)||"null");return Array.isArray(v)?v:fallback}catch(e){return fallback}};
 const state={page:"dashboard",transactions:safeLoad("dh_transactions"),students:safeLoad("dh_students"),fees:safeLoad("dh_fees")};
 const $=id=>document.getElementById(id),content=$("content"),sidebar=$("sidebar"),overlay=$("overlay"),modalBackdrop=$("modalBackdrop"),modal=$("modal"),pageTitle=$("pageTitle");
 const titles={dashboard:"Dashboard",transactions:"Income / Expenses",categories:"Categories",daily:"Today's Total",students:"Students Data",fees:"Student Fees",teachers:"Teacher Management",permissions:"Role & Permissions",accounts:"Accounts Overview",settings:"Settings"};
