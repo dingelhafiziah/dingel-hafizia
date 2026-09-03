@@ -11,11 +11,11 @@
     <aside class="sidebar" id="sidebar">
       <div class="brand"><div class="brand-mark">DH</div><div><strong>Dingel Hafizia</strong><span>Management App</span></div></div>
       <nav class="nav">
-        <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
-        <div class="nav-group"><div class="nav-heading">FINANCIAL MANAGEMENT</div><button class="nav-item" data-page="transactions">৳ <span>Income / Expenses</span></button><button class="nav-item" data-page="daily">▣ <span>Today's Total</span></button></div>
-        <div class="nav-group"><div class="nav-heading">STUDENT MANAGEMENT</div><button class="nav-item" data-page="students">♙ <span>Students Data</span></button><button class="nav-item" data-page="fees">▤ <span>Student Fees</span></button></div>
-        <div class="nav-group"><div class="nav-heading">STAFF</div><button class="nav-item" data-page="teachers">♟ <span>Teacher Management</span></button></div>
-        <div class="nav-group"><div class="nav-heading">ACCOUNTS</div><button class="nav-item" data-page="accounts">৳ <span>Accounts Overview</span></button></div>
+        <button class="nav-item active" data-page="dashboard" data-permission="dashboard">⌂ <span>Dashboard</span></button>
+        <div class="nav-group"><div class="nav-heading">FINANCIAL MANAGEMENT</div><button class="nav-item" data-page="transactions" data-permission="transactions">৳ <span>Income / Expenses</span></button><button class="nav-item" data-page="daily" data-permission="transactions">▣ <span>Today's Total</span></button></div>
+        <div class="nav-group"><div class="nav-heading">STUDENT MANAGEMENT</div><button class="nav-item" data-page="students" data-permission="students">♙ <span>Students Data</span></button><button class="nav-item" data-page="fees" data-permission="fees">▤ <span>Student Fees</span></button></div>
+        <div class="nav-group"><div class="nav-heading">STAFF</div><button class="nav-item" data-page="teachers" data-permission="teachers">♟ <span>Teacher Management</span></button><button class="nav-item" data-page="permissions" data-permission="settings">⚿ <span>Role & Permissions</span></button></div>
+        <div class="nav-group"><div class="nav-heading">ACCOUNTS</div><button class="nav-item" data-page="accounts" data-permission="accounts">৳ <span>Accounts Overview</span></button></div>
       </nav>
       <div class="sidebar-footer">Frontend • Firebase Ready</div>
     </aside>
@@ -31,5 +31,6 @@
   <script src="../stage3/fees-due.js"></script>
   <script src="../stage4/accounts.js"></script>
   <script src="../stage4/teacher-management.js"></script>
+  <script src="../stage4/teacher-permissions.js"></script>
 </body>
 </html>
