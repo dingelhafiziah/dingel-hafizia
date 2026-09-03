@@ -14,6 +14,7 @@
         <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
         <div class="nav-group"><div class="nav-heading">FINANCIAL MANAGEMENT</div><button class="nav-item" data-page="transactions">৳ <span>Income / Expenses</span></button><button class="nav-item" data-page="daily">▣ <span>Today's Total</span></button></div>
         <div class="nav-group"><div class="nav-heading">STUDENT MANAGEMENT</div><button class="nav-item" data-page="students">♙ <span>Students Data</span></button><button class="nav-item" data-page="fees">▤ <span>Student Fees</span></button></div>
+        <div class="nav-group"><div class="nav-heading">ACCOUNTS</div><button class="nav-item" data-page="accounts" onclick="document.getElementById('pageTitle').textContent='Accounts Overview';navigateAccounts()">৳ <span>Accounts Overview</span></button></div>
       </nav>
       <div class="sidebar-footer">Frontend • Firebase Ready</div>
     </aside>
@@ -27,5 +28,6 @@
   <script src="js/app.js"></script>
   <script src="../stage2/student-management.js"></script>
   <script src="../stage3/fees-due.js"></script>
+  <script src="../stage4/accounts.js"></script>
 </body>
 </html>
