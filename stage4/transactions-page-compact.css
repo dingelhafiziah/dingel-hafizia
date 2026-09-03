@@ -1,4 +1,4 @@
-/* Dingel Hafizia App — Option 2 professional transaction list UI */
+/* Dingel Hafizia App — Option 2 professional transaction details UI */
 .tx-page{display:flex!important;flex-direction:column!important;gap:9px!important;padding-bottom:18px!important}
 .tx-page>.page-head{display:none!important}
 .tx-page>.tx-add{order:1!important;margin:0!important;padding:11px 12px!important;border:1px solid #dbe4e1!important;border-radius:15px!important;box-shadow:0 3px 12px rgba(20,55,48,.055)!important}
@@ -13,19 +13,22 @@
 .tx-page>.tx-tools{order:3!important;display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(92px,.72fr)!important;gap:5px!important;margin:0!important;padding:5px!important;border:1px solid #dbe4e1!important;border-radius:13px!important;background:#fff!important;box-sizing:border-box!important;box-shadow:0 2px 8px rgba(20,55,48,.035)!important}
 .tx-page>.tx-tools>*{width:100%!important;min-width:0!important;box-sizing:border-box!important;height:35px!important;min-height:35px!important;margin:0!important;padding:6px 8px!important;border:1px solid #d3ddda!important;border-radius:9px!important;background:#fff!important;font-size:9px!important}
 .tx-page>.tx-list{order:4!important;margin:0!important;min-height:330px!important;border:1px solid #dbe4e1!important;border-radius:15px!important;box-shadow:0 3px 12px rgba(20,55,48,.045)!important;overflow:hidden!important;background:#fff!important}
+.tx-page>.tx-list:before{content:'Transaction Details';display:block;padding:10px 12px 8px;font-size:13px;font-weight:700;letter-spacing:.01em;color:#26333a;border-bottom:1px solid #edf1f0;background:#fbfcfc}
 .tx-page>.tx-list .table-wrap{width:100%!important;overflow-x:auto!important}
 .tx-page>.tx-list table{width:100%!important;min-width:620px!important;border-collapse:separate!important;border-spacing:0!important}
-.tx-page>.tx-list th{padding:10px 10px!important;font-size:9px!important;letter-spacing:.03em!important;background:#f6f8f8!important;white-space:nowrap!important}
-.tx-page>.tx-list td{padding:10px!important;font-size:10px!important;vertical-align:middle!important}
+.tx-page>.tx-list th{padding:10px 10px!important;font-size:9px!important;letter-spacing:.03em!important;background:#f6f8f8!important;white-space:nowrap!important;border-bottom:1px solid #e8eeec!important}
+.tx-page>.tx-list td{padding:10px!important;font-size:10px!important;vertical-align:middle!important;border-bottom:1px solid #f0f3f2!important}
+.tx-page>.tx-list tbody tr:last-child td{border-bottom:0!important}
 .tx-page>.tx-list th:first-child,.tx-page>.tx-list td:first-child{min-width:190px!important}
 .tx-page>.tx-list th:nth-child(2),.tx-page>.tx-list td:nth-child(2){min-width:75px!important}
 .tx-page>.tx-list th:nth-child(3),.tx-page>.tx-list td:nth-child(3){min-width:95px!important}
 .tx-page>.tx-list th:nth-child(4),.tx-page>.tx-list td:nth-child(4){min-width:90px!important;text-align:right!important}
 .tx-page>.tx-list th:last-child,.tx-page>.tx-list td:last-child{min-width:130px!important}
 .tx-page>.tx-list tbody tr:hover{background:#fafcfb!important}
-.tx-page>.tx-list .empty{min-height:235px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;gap:6px!important;text-align:center!important;padding:24px!important;box-sizing:border-box!important}
-.tx-page>.tx-list .empty strong{font-size:15px!important}
-.tx-page>.tx-list .empty span{font-size:10px!important;opacity:.58!important}
+.tx-page>.tx-list .empty{min-height:235px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;gap:7px!important;text-align:center!important;padding:24px!important;box-sizing:border-box!important}
+.tx-page>.tx-list .empty:before{content:'₹';width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid #e1e8e5;border-radius:50%;font-size:18px;font-weight:700;color:#18745e;background:#f4faf7}
+.tx-page>.tx-list .empty strong{font-size:14px!important}
+.tx-page>.tx-list .empty span{font-size:10px!important;opacity:.58!important;max-width:240px!important;line-height:1.4!important}
 @media(max-width:700px){
  .tx-page{gap:8px!important;padding-bottom:14px!important}
  .tx-page>.tx-add{padding:9px 10px!important;border-radius:13px!important}
@@ -40,6 +43,7 @@
  .tx-page>.tx-tools{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(88px,.75fr)!important;gap:4px!important;padding:5px!important;border-radius:12px!important}
  .tx-page>.tx-tools>*{height:34px!important;min-height:34px!important;padding:5px 6px!important;font-size:8px!important;border-radius:8px!important}
  .tx-page>.tx-list{min-height:360px!important;border-radius:13px!important}
+ .tx-page>.tx-list:before{padding:9px 10px 7px;font-size:12px!important}
  .tx-page>.tx-list table{min-width:600px!important}
  .tx-page>.tx-list th{padding:9px 8px!important;font-size:8px!important}
  .tx-page>.tx-list td{padding:9px 8px!important;font-size:9px!important}
@@ -52,4 +56,5 @@
  .tx-page>.tx-total .big{font-size:15px!important}
  .tx-page>.tx-tools{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(84px,.75fr)!important}
  .tx-page>.tx-tools>*{font-size:7.5px!important;padding-left:4px!important;padding-right:4px!important}
+ .tx-page>.tx-list:before{font-size:11px!important}
 }
