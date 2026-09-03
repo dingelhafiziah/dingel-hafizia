@@ -1,0 +1,27 @@
+/* FINAL: force Income / Expenses transactions into one compact row on mobile */
+.tx-page .tx-list .table-wrap{width:100%!important;overflow:hidden!important}
+.tx-page .tx-list table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse!important}
+.tx-page .tx-list th,.tx-page .tx-list td{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;padding:8px 3px!important;vertical-align:middle!important;box-sizing:border-box!important}
+.tx-page .tx-list th{font-size:7px!important;letter-spacing:0!important}
+.tx-page .tx-list td{font-size:7.5px!important}
+/* Description, Type, Category, Amount, Date, Action = 22/12/15/15/18/18 */
+.tx-page .tx-list th:nth-child(1),.tx-page .tx-list td:nth-child(1){width:22%!important}
+.tx-page .tx-list th:nth-child(2),.tx-page .tx-list td:nth-child(2){width:12%!important;text-align:center!important}
+.tx-page .tx-list th:nth-child(3),.tx-page .tx-list td:nth-child(3){width:15%!important}
+.tx-page .tx-list th:nth-child(4),.tx-page .tx-list td:nth-child(4){width:15%!important}
+.tx-page .tx-list th:nth-child(5),.tx-page .tx-list td:nth-child(5){width:18%!important}
+.tx-page .tx-list th:nth-child(6),.tx-page .tx-list td:nth-child(6){width:18%!important;text-align:center!important}
+.tx-page .tx-list td:first-child strong{font-size:8px!important;display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.tx-page .tx-list .badge{font-size:6px!important;padding:3px 3px!important;border-radius:6px!important;line-height:1!important}
+.tx-page .tx-list .tx-row-date{font-size:6.5px!important;white-space:nowrap!important}
+.tx-page .tx-list .table-action{font-size:6px!important;padding:2px 2px!important;margin:0!important;line-height:1!important;white-space:nowrap!important}
+.tx-page .tx-list .empty{min-height:300px!important}
+@media(max-width:390px){
+ .tx-page .tx-list th,.tx-page .tx-list td{padding:7px 2px!important}
+ .tx-page .tx-list th{font-size:6.5px!important}
+ .tx-page .tx-list td{font-size:7px!important}
+ .tx-page .tx-list td:first-child strong{font-size:7.5px!important}
+ .tx-page .tx-list .badge{font-size:5.5px!important;padding:2px!important}
+ .tx-page .tx-list .tx-row-date{font-size:6px!important}
+ .tx-page .tx-list .table-action{font-size:5.5px!important;padding:1px!important}
+}
